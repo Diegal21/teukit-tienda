@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Criar conta — TeuKit{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <h1>Criar conta</h1>
+    <form method="POST" class="checkout-form auth-form">
+        <label for="name">Nome completo</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Palavra-passe</label>
+        <input type="password" id="password" name="password" minlength="6" required>
+        <small class="field-hint">Mínimo 6 caracteres.</small>
+
+        <button type="submit" class="btn btn-primary btn-large">Criar conta</button>
+    </form>
+    <p class="auth-switch">Já tens conta? <a href="{{ url_for('login') }}">Iniciar sessão</a></p>
+</section>
+{% endblock %}

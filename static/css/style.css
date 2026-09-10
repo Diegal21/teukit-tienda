@@ -39,6 +39,19 @@ a { text-decoration: none; color: inherit; }
     height: 48px;
     border-radius: 8px;
 }
+
+.header-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.account-link {
+    color: var(--branco);
+    font-weight: 600;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+.account-link:hover { opacity: 1; }
 .cart-link {
     color: var(--branco);
     font-weight: 600;
@@ -52,6 +65,31 @@ a { text-decoration: none; color: inherit; }
     padding: 2px 7px;
     font-size: 0.75rem;
     margin-left: 6px;
+}
+
+/* AUTH PAGES */
+.auth-page {
+    max-width: 420px;
+    margin: 50px auto;
+}
+.auth-form { margin-top: 20px; }
+.field-hint {
+    color: #778899;
+    font-size: 0.8rem;
+    margin-top: -4px;
+}
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: #556677;
+}
+.auth-switch a {
+    color: var(--vermelho);
+    font-weight: 700;
+}
+.section-subtitle {
+    color: var(--azul-marino);
+    margin: 24px 0 16px;
 }
 
 /* FLASH MESSAGES */

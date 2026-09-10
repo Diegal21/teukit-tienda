@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sessão — TeuKit{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <h1>Iniciar sessão</h1>
+    <form method="POST" class="checkout-form auth-form">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autofocus>
+
+        <label for="password">Palavra-passe</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit" class="btn btn-primary btn-large">Entrar</button>
+    </form>
+    <p class="auth-switch">Ainda não tens conta? <a href="{{ url_for('register') }}">Criar conta</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}A minha conta — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Olá, {{ user.name }}</h1>
+    <a href="{{ url_for('logout') }}" class="btn btn-small">Sair</a>
+</div>
+
+<h2 class="section-subtitle">Os meus pedidos</h2>
+
+{% if orders_with_items|length == 0 %}
+    <p>Ainda não fizeste nenhum pedido.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">Ver produtos</a>
+{% else %}
+    {% for entry in orders_with_items %}
+    {% set order = entry.order %}
+    <div class="order-card">
+        <div class="order-card-header">
+            <div>
+                <strong>Pedido #{{ order.id }}</strong>
+                <span class="order-date">{{ order.created_at }}</span>
+            </div>
+            <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
+        </div>
+        <div class="order-card-body">
+            <ul class="summary-list">
+                {% for item in entry.order_items %}
+                <li>{{ item.quantity }}x {{ item.product_name }} — {{ price_display(item.unit_price_cents * item.quantity) }}</li>
+                {% endfor %}
+            </ul>
+            <p class="order-total"><strong>Total: {{ price_display(order.total_cents) }}</strong></p>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

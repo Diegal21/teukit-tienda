@@ -13,13 +13,21 @@
         <a href="{{ url_for('home') }}" class="logo-link">
             <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="TeuKit" class="logo-img">
         </a>
-        <a href="{{ url_for('cart_view') }}" class="cart-link">
-            🛒 Carrinho
-            {% set cart = session.get('cart', {}) %}
-            {% if cart %}
-                <span class="cart-badge">{{ cart.values() | sum }}</span>
+        <div class="header-links">
+            {% if current_user %}
+                <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>
+                <a href="{{ url_for('logout') }}" class="account-link">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="account-link">Iniciar sessão</a>
             {% endif %}
-        </a>
+            <a href="{{ url_for('cart_view') }}" class="cart-link">
+                🛒 Carrinho
+                {% set cart = session.get('cart', {}) %}
+                {% if cart %}
+                    <span class="cart-badge">{{ cart.values() | sum }}</span>
+                {% endif %}
+            </a>
+        </div>
     </div>
 </header>
 

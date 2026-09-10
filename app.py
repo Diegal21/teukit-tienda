@@ -1,9 +1,12 @@
 import os
 import sqlite3
 from flask import Flask, render_template, redirect, url_for, session, request, flash, g
+from werkzeug.security import generate_password_hash, check_password_hash
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(basedir, 'teukit.db')
+# DB_PATH es configurable por variable de entorno para poder apuntar a un
+# volumen persistente en Railway (ver README para instrucciones de montaje).
+DB_PATH = os.environ.get('DB_PATH', os.path.join(basedir, 'teukit.db'))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'cambia-esta-clave-en-produccion')
@@ -30,6 +33,15 @@ def close_db(exception=None):
 def init_db():
     db = sqlite3.connect(DB_PATH)
     db.execute('''
+        CREATE TABLE IF NOT EXISTS user (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    db.execute('''
         CREATE TABLE IF NOT EXISTS product (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -44,6 +56,7 @@ def init_db():
     db.execute('''
         CREATE TABLE IF NOT EXISTS "order" (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
             customer_name TEXT NOT NULL,
             customer_email TEXT NOT NULL,
             customer_address TEXT NOT NULL,
@@ -142,6 +155,31 @@ def admin_required(view_func):
     return wrapped
 
 
+def get_current_user():
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    db = get_db()
+    return db.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
+
+
+def login_required(view_func):
+    from functools import wraps
+
+    @wraps(view_func)
+    def wrapped(*args, **kwargs):
+        if not session.get('user_id'):
+            flash('Precisas de iniciar sessão para aceder a esta página.', 'error')
+            return redirect(url_for('login', next=request.path))
+        return view_func(*args, **kwargs)
+    return wrapped
+
+
+@app.context_processor
+def inject_current_user():
+    return {'current_user': get_current_user()}
+
+
 # ----------------------------
 # RUTAS
 # ----------------------------
@@ -210,6 +248,8 @@ def checkout():
         flash('Tu carrito está vacío.', 'error')
         return redirect(url_for('home'))
 
+    current_user = get_current_user()
+
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip()
@@ -218,13 +258,14 @@ def checkout():
 
         if not name or not email or not address:
             flash('Por favor completa nombre, email y dirección.', 'error')
-            return render_template('checkout.html', items=items, total_display=price_display(total_cents))
+            return render_template('checkout.html', items=items, total_display=price_display(total_cents), current_user=current_user)
 
         db = get_db()
+        user_id = current_user['id'] if current_user else None
         cursor = db.execute('''
-            INSERT INTO "order" (customer_name, customer_email, customer_address, customer_phone, total_cents, status)
-            VALUES (?, ?, ?, ?, ?, 'pendiente')
-        ''', (name, email, address, phone, total_cents))
+            INSERT INTO "order" (user_id, customer_name, customer_email, customer_address, customer_phone, total_cents, status)
+            VALUES (?, ?, ?, ?, ?, ?, 'pendiente')
+        ''', (user_id, name, email, address, phone, total_cents))
         order_id = cursor.lastrowid
 
         for item in items:
@@ -244,7 +285,7 @@ def checkout():
         save_cart({})
         return redirect(url_for('order_confirmation', order_id=order_id))
 
-    return render_template('checkout.html', items=items, total_display=price_display(total_cents))
+    return render_template('checkout.html', items=items, total_display=price_display(total_cents), current_user=current_user)
 
 
 @app.route('/pedido/<int:order_id>/confirmacion')
@@ -254,6 +295,87 @@ def order_confirmation(order_id):
     if not order:
         return "Pedido no encontrado", 404
     return render_template('order_confirmation.html', order=order)
+
+
+# ----------------------------
+# CUENTAS DE CLIENTE
+# ----------------------------
+
+@app.route('/registro', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        if not name or not email or not password:
+            flash('Por favor preenche todos os campos.', 'error')
+            return render_template('register.html')
+
+        if len(password) < 6:
+            flash('A palavra-passe deve ter pelo menos 6 caracteres.', 'error')
+            return render_template('register.html')
+
+        db = get_db()
+        existing = db.execute('SELECT id FROM user WHERE email = ?', (email,)).fetchone()
+        if existing:
+            flash('Já existe uma conta com este email.', 'error')
+            return render_template('register.html')
+
+        password_hash = generate_password_hash(password)
+        cursor = db.execute(
+            'INSERT INTO user (name, email, password_hash) VALUES (?, ?, ?)',
+            (name, email, password_hash)
+        )
+        db.commit()
+        session['user_id'] = cursor.lastrowid
+        flash(f'Bem-vindo(a), {name}!', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        db = get_db()
+        user = db.execute('SELECT * FROM user WHERE email = ?', (email,)).fetchone()
+
+        if user and check_password_hash(user['password_hash'], password):
+            session['user_id'] = user['id']
+            flash(f'Bem-vindo(a) de volta, {user["name"]}!', 'success')
+            next_url = request.args.get('next') or url_for('home')
+            return redirect(next_url)
+
+        flash('Email ou palavra-passe incorretos.', 'error')
+
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('home'))
+
+
+@app.route('/minha-conta')
+@login_required
+def my_account():
+    db = get_db()
+    user = get_current_user()
+    orders = db.execute(
+        'SELECT * FROM "order" WHERE user_id = ? ORDER BY created_at DESC', (user['id'],)
+    ).fetchall()
+
+    orders_with_items = []
+    for order in orders:
+        items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order['id'],)).fetchall()
+        orders_with_items.append({'order': order, 'order_items': items})
+
+    return render_template('my_account.html', user=user, orders_with_items=orders_with_items)
 
 
 # ----------------------------

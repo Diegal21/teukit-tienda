@@ -17,10 +17,10 @@
 
     <form method="POST" class="checkout-form">
         <label for="name">Nome completo *</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" value="{{ current_user.name if current_user else '' }}" required>
 
         <label for="email">Email *</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" value="{{ current_user.email if current_user else '' }}" required>
 
         <label for="phone">Telefone</label>
         <input type="tel" id="phone" name="phone">
