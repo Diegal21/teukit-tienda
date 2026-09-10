@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Pedido confirmado — TeuKit{% endblock %}
+
+{% block content %}
+<section class="confirmation">
+    <h1>✅ Obrigado, {{ order.customer_name }}!</h1>
+    <p>O teu pedido <strong>#{{ order.id }}</strong> foi registado com sucesso.</p>
+    <p>Total: <strong>{{ order.total_display }}</strong></p>
+    <p>Enviámos os detalhes para <strong>{{ order.customer_email }}</strong>. Entraremos em contacto brevemente para confirmar o pagamento e envio.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">Voltar à loja</a>
+</section>
+{% endblock %}

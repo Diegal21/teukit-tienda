@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — TeuKit{% endblock %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="product-detail-img">
+        <img src="{{ url_for('static', filename='img/' + product.image) }}" alt="{{ product.name }}">
+    </div>
+    <div class="product-detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="price price-large">{{ price_display(product.price_cents) }}</p>
+        <p class="description">{{ product.description }}</p>
+
+        <form action="{{ url_for('cart_add', product_id=product.id) }}" method="POST" class="add-to-cart-form">
+            <label for="quantity">Quantidade:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
+            <button type="submit" class="btn btn-primary btn-large">Adicionar ao carrinho</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

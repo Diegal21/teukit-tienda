@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Carrinho — TeuKit{% endblock %}
+
+{% block content %}
+<h1>O teu carrinho</h1>
+
+{% if is_empty %}
+    <p>O teu carrinho está vazio.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">Ver produtos</a>
+{% else %}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ price_display(item.product.price_cents) }}</td>
+                <td>
+                    <form action="{{ url_for('cart_update', product_id=item.product.id) }}" method="POST" class="qty-form">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}">
+                        <button type="submit" class="btn btn-small">Atualizar</button>
+                    </form>
+                </td>
+                <td>{{ item.subtotal_display }}</td>
+                <td><a href="{{ url_for('cart_remove', product_id=item.product.id) }}" class="remove-link">Remover</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="cart-total">
+        <strong>Total: {{ total_display }}</strong>
+    </div>
+
+    <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-large">Finalizar compra</a>
+{% endif %}
+{% endblock %}

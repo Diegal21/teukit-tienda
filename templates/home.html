@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}TeuKit — Já tens o teu?{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <h1>Já tens o teu KIT de emergência?</h1>
+    <p>Tudo o que precisas para os primeiros minutos que importam.</p>
+</section>
+
+<section class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <a href="{{ url_for('product_detail', slug=product.slug) }}">
+            <img src="{{ url_for('static', filename='img/' + product.image) }}" alt="{{ product.name }}" class="product-img">
+        </a>
+        <div class="product-card-body">
+            <h2>{{ product.name }}</h2>
+            <p class="price">{{ price_display(product.price_cents) }}</p>
+            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary">Ver produto</a>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+
+{% endblock %}

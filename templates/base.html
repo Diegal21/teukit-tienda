@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}TeuKit — Já tens o teu?{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="{{ url_for('home') }}" class="logo-link">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="TeuKit" class="logo-img">
+        </a>
+        <a href="{{ url_for('cart_view') }}" class="cart-link">
+            🛒 Carrinho
+            {% set cart = session.get('cart', {}) %}
+            {% if cart %}
+                <span class="cart-badge">{{ cart.values() | sum }}</span>
+            {% endif %}
+        </a>
+    </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container flash-container">
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; {{ 2026 }} TeuKit — Já tens o teu?</p>
+    </div>
+</footer>
+
+</body>
+</html>
