@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Pedidos — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Pedidos</h1>
+    <a href="{{ url_for('admin_logout') }}" class="btn btn-small">Sair</a>
+</div>
+
+{% if orders_with_items|length == 0 %}
+    <p>Ainda não há pedidos.</p>
+{% else %}
+    {% for entry in orders_with_items %}
+    {% set order = entry.order %}
+    <div class="order-card">
+        <div class="order-card-header">
+            <div>
+                <strong>Pedido #{{ order.id }}</strong>
+                <span class="order-date">{{ order.created_at }}</span>
+            </div>
+            <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
+        </div>
+
+        <div class="order-card-body">
+            <p><strong>Cliente:</strong> {{ order.customer_name }}</p>
+            <p><strong>Email:</strong> {{ order.customer_email }}</p>
+            {% if order.customer_phone %}
+            <p><strong>Telefone:</strong> {{ order.customer_phone }}</p>
+            {% endif %}
+            <p><strong>Morada:</strong> {{ order.customer_address }}</p>
+
+            <ul class="summary-list">
+                {% for item in entry.order_items %}
+                <li>{{ item.quantity }}x {{ item.product_name }} — {{ price_display(item.unit_price_cents * item.quantity) }}</li>
+                {% endfor %}
+            </ul>
+
+            <p class="order-total"><strong>Total: {{ price_display(order.total_cents) }}</strong></p>
+        </div>
+
+        <form action="{{ url_for('admin_update_status', order_id=order.id) }}" method="POST" class="status-form">
+            <label for="status-{{ order.id }}">Estado:</label>
+            <select name="status" id="status-{{ order.id }}">
+                <option value="pendiente" {% if order.status == 'pendiente' %}selected{% endif %}>Pendente</option>
+                <option value="pagado" {% if order.status == 'pagado' %}selected{% endif %}>Pago</option>
+                <option value="enviado" {% if order.status == 'enviado' %}selected{% endif %}>Enviado</option>
+            </select>
+            <button type="submit" class="btn btn-small">Atualizar</button>
+        </form>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

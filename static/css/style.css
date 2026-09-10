@@ -250,6 +250,68 @@ a { text-decoration: none; color: inherit; }
     margin-top: 40px;
 }
 
+/* ADMIN */
+.admin-login {
+    max-width: 400px;
+    margin: 60px auto;
+    text-align: center;
+}
+.admin-login-form {
+    margin-top: 20px;
+    text-align: left;
+}
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0 20px;
+}
+.order-card {
+    background: var(--branco);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 10px rgba(15,45,79,0.08);
+}
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.order-date {
+    color: #778899;
+    font-size: 0.85rem;
+    margin-left: 10px;
+}
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.status-pendiente { background: #fff3cd; color: #7a5a10; }
+.status-pagado { background: #d8ecf5; color: #0f5a7a; }
+.status-enviado { background: #e3f0d8; color: #3d5a24; }
+.order-card-body p { margin-bottom: 6px; }
+.order-total { margin-top: 10px; color: var(--azul-marino); font-size: 1.1rem; }
+.status-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+}
+.status-form select {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
 /* RESPONSIVE */
 @media (max-width: 700px) {
     .product-detail, .checkout-layout { grid-template-columns: 1fr; }

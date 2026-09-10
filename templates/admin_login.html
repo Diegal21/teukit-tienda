@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Admin — TeuKit{% endblock %}
+
+{% block content %}
+<section class="admin-login">
+    <h1>Área de administração</h1>
+    <form method="POST" class="checkout-form admin-login-form">
+        <label for="password">Palavra-passe</label>
+        <input type="password" id="password" name="password" required autofocus>
+        <button type="submit" class="btn btn-primary btn-large">Entrar</button>
+    </form>
+</section>
+{% endblock %}
