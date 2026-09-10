@@ -124,6 +124,23 @@ def get_cart_items():
 
 app.jinja_env.globals.update(price_display=price_display)
 
+# Contraseña del panel de administración.
+# En Railway, configúrala como variable de entorno ADMIN_PASSWORD para no
+# dejarla escrita en el código. Localmente, si no la defines, usa esta por
+# defecto SOLO para pruebas.
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'teukit2026')
+
+
+def admin_required(view_func):
+    from functools import wraps
+
+    @wraps(view_func)
+    def wrapped(*args, **kwargs):
+        if not session.get('is_admin'):
+            return redirect(url_for('admin_login'))
+        return view_func(*args, **kwargs)
+    return wrapped
+
 
 # ----------------------------
 # RUTAS
@@ -237,6 +254,56 @@ def order_confirmation(order_id):
     if not order:
         return "Pedido no encontrado", 404
     return render_template('order_confirmation.html', order=order)
+
+
+# ----------------------------
+# PANEL DE ADMINISTRACIÓN (PEDIDOS)
+# ----------------------------
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        if password == ADMIN_PASSWORD:
+            session['is_admin'] = True
+            return redirect(url_for('admin_orders'))
+        flash('Contraseña incorrecta.', 'error')
+    return render_template('admin_login.html')
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('is_admin', None)
+    return redirect(url_for('admin_login'))
+
+
+@app.route('/admin/pedidos')
+@admin_required
+def admin_orders():
+    db = get_db()
+    orders = db.execute('SELECT * FROM "order" ORDER BY created_at DESC').fetchall()
+
+    orders_with_items = []
+    for order in orders:
+        items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order['id'],)).fetchall()
+        orders_with_items.append({'order': order, 'order_items': items})
+
+    return render_template('admin_orders.html', orders_with_items=orders_with_items)
+
+
+@app.route('/admin/pedidos/<int:order_id>/estado', methods=['POST'])
+@admin_required
+def admin_update_status(order_id):
+    new_status = request.form.get('status')
+    if new_status not in ('pendiente', 'pagado', 'enviado'):
+        flash('Estado no válido.', 'error')
+        return redirect(url_for('admin_orders'))
+
+    db = get_db()
+    db.execute('UPDATE "order" SET status = ? WHERE id = ?', (new_status, order_id))
+    db.commit()
+    flash(f'Pedido #{order_id} actualizado a "{new_status}".', 'success')
+    return redirect(url_for('admin_orders'))
 
 
 # ----------------------------
