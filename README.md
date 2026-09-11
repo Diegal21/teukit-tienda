@@ -55,24 +55,27 @@ Cuando un cliente completa una compra, se envían automáticamente dos emails:
 - Al **cliente**: confirmación con el resumen de su pedido
 - A **ti**: aviso de nuevo pedido con los datos para prepararlo
 
-Usamos **Brevo** (gratis hasta 300 emails/día) como servicio de envío. Mientras no configures las credenciales, el sistema simplemente no envía nada (no rompe la compra) — verás un aviso en los logs.
+Usamos la **API HTTP de Brevo** (gratis hasta 300 emails/día) — no SMTP, porque Railway bloquea las conexiones SMTP salientes en su plan gratuito. La API funciona sin ese problema, en cualquier plan.
+
+Mientras no configures la API key, el sistema simplemente no envía nada (no rompe la compra) — verás un aviso en los logs.
 
 **Para activarlo:**
 
-1. Crea una cuenta gratis en [brevo.com](https://www.brevo.com/)
-2. Ve a **Settings → SMTP & API** dentro de Brevo y copia tus credenciales SMTP (usuario y clave)
-3. En Railway, añade estas variables de entorno (pestaña **Variables**):
+1. Crea una cuenta gratis en [brevo.com](https://www.brevo.com/) (si ya la creaste, sáltate este paso)
+2. Ve a **Settings → SMTP & API → pestaña "API Keys"** (no la de SMTP) dentro de Brevo
+3. Genera una nueva **API Key** y cópiala de inmediato (solo se muestra completa una vez)
+4. Verifica también tu email remitente en **Settings → Senders, Domains & Dedicated IPs** si no lo hiciste antes
+5. En Railway, añade estas variables de entorno (pestaña **Variables**):
 
 | Variable | Valor |
 |---|---|
-| `SMTP_USER` | tu usuario SMTP de Brevo |
-| `SMTP_PASSWORD` | tu clave SMTP de Brevo |
-| `SENDER_EMAIL` | el email remitente verificado en Brevo (ej. `naoresponder@teukit.pt`) |
+| `BREVO_API_KEY` | la API Key que acabas de generar |
+| `SENDER_EMAIL` | el email remitente verificado en Brevo (ej. `teukit.pt@gmail.com`) |
 | `ADMIN_NOTIFICATION_EMAIL` | tu email personal, donde quieres recibir el aviso de nuevos pedidos |
 
-4. Railway redesplegará solo. A partir de ahí, cada compra enviará ambos emails automáticamente.
+6. Railway redesplegará solo. A partir de ahí, cada compra enviará ambos emails automáticamente.
 
-**Importante:** en Brevo, el email remitente (`SENDER_EMAIL`) debe estar verificado en tu cuenta antes de poder usarlo — Brevo te guía por ese proceso al crear la cuenta.
+**Nota:** ya no se usan las variables `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_HOST` ni `SMTP_PORT` — puedes eliminarlas de Railway si las habías configurado antes.
 
 ## IMPORTANTE: Volumen persistente en Railway (evita perder datos)
 

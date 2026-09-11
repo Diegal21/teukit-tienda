@@ -1,9 +1,7 @@
 import os
 import sqlite3
-import smtplib
 import threading
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 from flask import Flask, render_template, redirect, url_for, session, request, flash, g
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -148,38 +146,46 @@ app.jinja_env.globals.update(price_display=price_display)
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'teukit2026')
 
 # ----------------------------
-# CONFIGURACIÓN DE EMAIL (Brevo SMTP)
+# CONFIGURACIÓN DE EMAIL (API de Brevo, vía HTTPS)
 # ----------------------------
-# Configura estas variables de entorno en Railway cuando tengas tu cuenta de Brevo:
-# SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL, ADMIN_NOTIFICATION_EMAIL
-SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp-relay.brevo.com')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
-SMTP_USER = os.environ.get('SMTP_USER')
-SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
+# Railway bloquea las conexiones SMTP salientes en su plan gratuito, así que
+# usamos la API HTTP de Brevo en vez de SMTP — funciona en cualquier plan.
+# Configura en Railway: BREVO_API_KEY, SENDER_EMAIL, ADMIN_NOTIFICATION_EMAIL
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'naoresponder@teukit.pt')
 SENDER_NAME = os.environ.get('SENDER_NAME', 'TeuKit')
 ADMIN_NOTIFICATION_EMAIL = os.environ.get('ADMIN_NOTIFICATION_EMAIL')
+BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email'
 
 
 def send_email(to_email, subject, html_body):
-    """Envía un email por SMTP. Si no hay credenciales configuradas (ej. en
-    desarrollo local), no falla: solo lo registra en la consola y continúa."""
-    if not SMTP_USER or not SMTP_PASSWORD:
-        print(f"[EMAIL NO ENVIADO - faltan credenciales SMTP] Para: {to_email} | Asunto: {subject}")
+    """Envía un email a través de la API HTTP de Brevo. Si no hay API key
+    configurada (ej. en desarrollo local), no falla: solo lo registra en la
+    consola y continúa."""
+    if not BREVO_API_KEY:
+        print(f"[EMAIL NO ENVIADO - falta BREVO_API_KEY] Para: {to_email} | Asunto: {subject}")
         return False
 
     try:
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = f"{SENDER_NAME} <{SENDER_EMAIL}>"
-        msg['To'] = to_email
-        msg.attach(MIMEText(html_body, 'html'))
-
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
-        return True
+        response = requests.post(
+            BREVO_API_URL,
+            headers={
+                'accept': 'application/json',
+                'api-key': BREVO_API_KEY,
+                'content-type': 'application/json',
+            },
+            json={
+                'sender': {'name': SENDER_NAME, 'email': SENDER_EMAIL},
+                'to': [{'email': to_email}],
+                'subject': subject,
+                'htmlContent': html_body,
+            },
+            timeout=10
+        )
+        if response.status_code in (200, 201):
+            return True
+        print(f"[ERROR AL ENVIAR EMAIL] Para: {to_email} | Status: {response.status_code} | {response.text}")
+        return False
     except Exception as e:
         print(f"[ERROR AL ENVIAR EMAIL] Para: {to_email} | Error: {e}")
         return False
