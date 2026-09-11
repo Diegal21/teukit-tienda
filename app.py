@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import smtplib
+import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, redirect, url_for, session, request, flash, g
@@ -156,6 +157,7 @@ SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
 SMTP_USER = os.environ.get('SMTP_USER')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'naoresponder@teukit.pt')
+SENDER_NAME = os.environ.get('SENDER_NAME', 'TeuKit')
 ADMIN_NOTIFICATION_EMAIL = os.environ.get('ADMIN_NOTIFICATION_EMAIL')
 
 
@@ -169,11 +171,11 @@ def send_email(to_email, subject, html_body):
     try:
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
-        msg['From'] = SENDER_EMAIL
+        msg['From'] = f"{SENDER_NAME} <{SENDER_EMAIL}>"
         msg['To'] = to_email
         msg.attach(MIMEText(html_body, 'html'))
 
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
@@ -381,8 +383,12 @@ def checkout():
         # Ver create_stripe_checkout_session() comentada más abajo.
         # De momento el pedido queda registrado como "pendiente".
 
-        # --- NOTIFICACIONES POR EMAIL ---
-        send_order_emails(order_id, name, email, address, phone, items, total_cents)
+        # --- NOTIFICACIONES POR EMAIL (en segundo plano, no bloquea la compra) ---
+        threading.Thread(
+            target=send_order_emails,
+            args=(order_id, name, email, address, phone, items, total_cents),
+            daemon=True
+        ).start()
 
         save_cart({})
         return redirect(url_for('order_confirmation', order_id=order_id))
