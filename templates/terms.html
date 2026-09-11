@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Termos e Condições — TeuKit{% endblock %}
+
+{% block content %}
+<section class="legal-page">
+    <h1>Termos e Condições de Venda</h1>
+    <p class="legal-updated">Última atualização: [DATA]</p>
+
+    <div class="legal-placeholder-notice">
+        ⚠️ Este documento contém campos entre colchetes <code>[ASSIM]</code> que precisas de preencher com os dados reais do teu negócio antes de publicares a loja oficialmente.
+    </div>
+
+    <h2>1. Identificação do vendedor</h2>
+    <ul>
+        <li><strong>Nome/Firma:</strong> [NOME COMPLETO OU FIRMA DA EMPRESA]</li>
+        <li><strong>NIF:</strong> [NÚMERO DE IDENTIFICAÇÃO FISCAL]</li>
+        <li><strong>Morada:</strong> [MORADA COMPLETA]</li>
+        <li><strong>Email de contacto:</strong> [EMAIL DE CONTACTO]</li>
+    </ul>
+
+    <h2>2. Produtos e preços</h2>
+    <p>
+        Os preços apresentados no site estão expressos em euros (€) e incluem o IVA à
+        taxa legal em vigor, salvo indicação em contrário. Reservamo-nos o direito de
+        alterar os preços a qualquer momento, sem que isso afete encomendas já
+        confirmadas.
+    </p>
+
+    <h2>3. Processo de encomenda</h2>
+    <p>
+        Ao finalizar uma compra, receberás uma confirmação do teu pedido. A encomenda
+        fica registada com o estado "pendente" até à confirmação do pagamento por parte
+        do vendedor.
+    </p>
+
+    <h2>4. Métodos de pagamento</h2>
+    <p>
+        [DESCREVER OS MÉTODOS DE PAGAMENTO DISPONÍVEIS — ex.: transferência bancária,
+        cartão via Stripe/SumUp, MB WAY, etc. Atualizar esta secção quando ativares o
+        pagamento online.]
+    </p>
+
+    <h2>5. Envio e entrega</h2>
+    <p>
+        [DESCREVER PRAZOS DE ENVIO, ZONAS DE ENTREGA (ex. Portugal, Espanha, restante
+        Europa) E CUSTOS DE PORTES.]
+    </p>
+
+    <h2>6. Direito de livre resolução (devolução)</h2>
+    <p>
+        Nos termos da legislação europeia de proteção do consumidor, tens o direito de
+        resolver o contrato de compra sem necessidade de indicar qualquer motivo, no
+        prazo de <strong>14 dias</strong> a contar da receção do produto.
+    </p>
+    <p>
+        Para exercer este direito, contacta-nos através de [EMAIL DE CONTACTO]. O
+        produto deverá ser devolvido nas condições em que foi recebido, incluindo
+        embalagem original quando possível. Os custos de devolução são da
+        responsabilidade do cliente, salvo indicação em contrário.
+    </p>
+    <p>
+        Este direito não se aplica a produtos que, por razões de higiene ou saúde,
+        tenham sido desselados após a entrega (ex. máscaras, material de primeiros
+        socorros), caso tenham sido abertos.
+    </p>
+
+    <h2>7. Garantia</h2>
+    <p>
+        Os produtos vendidos beneficiam da garantia legal de conformidade prevista na
+        legislação portuguesa e europeia aplicável.
+    </p>
+
+    <h2>8. Limitação de responsabilidade</h2>
+    <p>
+        Os kits de emergência vendidos neste site destinam-se a apoiar situações de
+        emergência mas não substituem assistência médica ou de emergência profissional.
+        Em caso de emergência real, contacta sempre o número de emergência (112).
+    </p>
+
+    <h2>9. Resolução de litígios</h2>
+    <p>
+        Em caso de litígio, o consumidor pode recorrer a uma entidade de Resolução
+        Alternativa de Litígios de Consumo, ou submeter a sua reclamação através da
+        Plataforma Europeia de Resolução de Litígios em Linha:
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.
+    </p>
+
+    <h2>10. Lei aplicável</h2>
+    <p>
+        Estes Termos e Condições regem-se pela lei portuguesa, sem prejuízo dos
+        direitos imperativos de proteção do consumidor aplicáveis no país de
+        residência do cliente, quando dentro da União Europeia.
+    </p>
+</section>
+{% endblock %}

@@ -1,5 +1,8 @@
 import os
 import sqlite3
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, redirect, url_for, session, request, flash, g
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -143,6 +146,80 @@ app.jinja_env.globals.update(price_display=price_display)
 # defecto SOLO para pruebas.
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'teukit2026')
 
+# ----------------------------
+# CONFIGURACIÓN DE EMAIL (Brevo SMTP)
+# ----------------------------
+# Configura estas variables de entorno en Railway cuando tengas tu cuenta de Brevo:
+# SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL, ADMIN_NOTIFICATION_EMAIL
+SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp-relay.brevo.com')
+SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+SMTP_USER = os.environ.get('SMTP_USER')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'naoresponder@teukit.pt')
+ADMIN_NOTIFICATION_EMAIL = os.environ.get('ADMIN_NOTIFICATION_EMAIL')
+
+
+def send_email(to_email, subject, html_body):
+    """Envía un email por SMTP. Si no hay credenciales configuradas (ej. en
+    desarrollo local), no falla: solo lo registra en la consola y continúa."""
+    if not SMTP_USER or not SMTP_PASSWORD:
+        print(f"[EMAIL NO ENVIADO - faltan credenciales SMTP] Para: {to_email} | Asunto: {subject}")
+        return False
+
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = to_email
+        msg.attach(MIMEText(html_body, 'html'))
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
+        return True
+    except Exception as e:
+        print(f"[ERROR AL ENVIAR EMAIL] Para: {to_email} | Error: {e}")
+        return False
+
+
+def send_order_emails(order_id, name, email, address, phone, items, total_cents):
+    items_html = "".join(
+        f"<li>{item['quantity']}x {item['product']['name']} — {price_display(item['product']['price_cents'] * item['quantity'])}</li>"
+        for item in items
+    )
+    total_str = price_display(total_cents)
+
+    # Email al cliente
+    customer_html = f"""
+    <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: #0f2d4f;">Obrigado pelo teu pedido, {name}!</h2>
+        <p>O teu pedido <strong>#{order_id}</strong> foi registado com sucesso.</p>
+        <ul>{items_html}</ul>
+        <p><strong>Total: {total_str}</strong></p>
+        <p>Morada de envio: {address}</p>
+        <p>Entraremos em contacto brevemente para confirmar o pagamento e envio.</p>
+        <p style="color: #888; font-size: 0.85rem;">TeuKit — Já tens o teu?</p>
+    </div>
+    """
+    send_email(email, f"Confirmação do teu pedido #{order_id} — TeuKit", customer_html)
+
+    # Email al administrador
+    if ADMIN_NOTIFICATION_EMAIL:
+        admin_html = f"""
+        <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+            <h2 style="color: #d9432e;">🎉 Novo pedido recebido — #{order_id}</h2>
+            <p><strong>Cliente:</strong> {name}</p>
+            <p><strong>Email:</strong> {email}</p>
+            <p><strong>Telefone:</strong> {phone or '—'}</p>
+            <p><strong>Morada:</strong> {address}</p>
+            <ul>{items_html}</ul>
+            <p><strong>Total: {total_str}</strong></p>
+            <p>Vê e gere este pedido no <a href="/admin/pedidos">painel de administração</a>.</p>
+        </div>
+        """
+        send_email(ADMIN_NOTIFICATION_EMAIL, f"Novo pedido #{order_id} — {total_str}", admin_html)
+
 
 def admin_required(view_func):
     from functools import wraps
@@ -203,6 +280,16 @@ def product_detail(slug):
 @app.route('/guia')
 def guide():
     return render_template('guide.html')
+
+
+@app.route('/privacidade')
+def privacy_policy():
+    return render_template('privacy.html')
+
+
+@app.route('/termos')
+def terms():
+    return render_template('terms.html')
 
 
 @app.route('/carrito/agregar/<int:product_id>', methods=['POST'])
@@ -293,6 +380,9 @@ def checkout():
         # Aquí es donde se conecta Stripe cuando tengas tu cuenta creada.
         # Ver create_stripe_checkout_session() comentada más abajo.
         # De momento el pedido queda registrado como "pendiente".
+
+        # --- NOTIFICACIONES POR EMAIL ---
+        send_order_emails(order_id, name, email, address, phone, items, total_cents)
 
         save_cart({})
         return redirect(url_for('order_confirmation', order_id=order_id))
