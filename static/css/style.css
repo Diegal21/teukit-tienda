@@ -67,6 +67,64 @@ a { text-decoration: none; color: inherit; }
     margin-left: 6px;
 }
 
+/* GUIDE PAGE */
+.guide-page {
+    padding: 30px 0 60px;
+}
+.guide-page h1 {
+    color: var(--azul-marino);
+    margin-bottom: 12px;
+}
+.guide-intro {
+    color: #556677;
+    max-width: 700px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+.guide-download-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--branco);
+    border: 2px solid var(--amarelo);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 40px;
+}
+.guide-download-icon { font-size: 2.5rem; }
+.guide-download-card h3 { color: var(--azul-marino); margin-bottom: 4px; }
+.guide-download-card p { color: #667788; font-size: 0.9rem; }
+.guide-download-card .btn { margin-left: auto; white-space: nowrap; }
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+}
+.guide-item {
+    background: var(--branco);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(15,45,79,0.06);
+}
+.guide-item h3 {
+    color: var(--azul-marino);
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+.guide-item p {
+    color: #667788;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.guide-emergency-box {
+    background: #fff3cd;
+    border-radius: 12px;
+    padding: 20px 24px;
+}
+.guide-emergency-box h3 { color: #7a5a10; margin-bottom: 8px; }
+.guide-emergency-box p { color: #7a5a10; }
+
 /* AUTH PAGES */
 .auth-page {
     max-width: 420px;
@@ -386,4 +444,6 @@ a { text-decoration: none; color: inherit; }
 /* RESPONSIVE */
 @media (max-width: 700px) {
     .product-detail, .checkout-layout { grid-template-columns: 1fr; }
+    .guide-download-card { flex-direction: column; text-align: center; }
+    .guide-download-card .btn { margin-left: 0; }
 }

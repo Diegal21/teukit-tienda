@@ -14,6 +14,7 @@
             <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="TeuKit" class="logo-img">
         </a>
         <div class="header-links">
+            <a href="{{ url_for('guide') }}" class="account-link">Guia</a>
             {% if current_user %}
                 <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>
                 <a href="{{ url_for('logout') }}" class="account-link">Sair</a>

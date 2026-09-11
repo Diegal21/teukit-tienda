@@ -200,6 +200,11 @@ def product_detail(slug):
     return render_template('product_detail.html', product=product)
 
 
+@app.route('/guia')
+def guide():
+    return render_template('guide.html')
+
+
 @app.route('/carrito/agregar/<int:product_id>', methods=['POST'])
 def cart_add(product_id):
     db = get_db()
