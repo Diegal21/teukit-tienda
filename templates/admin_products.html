@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Produtos — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Produtos</h1>
+    <div>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-small">Ver pedidos</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-small">Sair</a>
+    </div>
+</div>
+
+{% for product in products %}
+<div class="order-card">
+    <div class="order-card-header">
+        <strong>{{ product.name }}</strong>
+        <span class="status-badge {% if product.stock > 0 %}status-enviado{% else %}status-pendiente{% endif %}">
+            {% if product.stock > 0 %}{{ product.stock }} em stock{% else %}Esgotado{% endif %}
+        </span>
+    </div>
+
+    <form action="{{ url_for('admin_update_product', product_id=product.id) }}" method="POST" class="product-edit-form">
+        <div class="field-row">
+            <label for="stock-{{ product.id }}">Stock disponível</label>
+            <input type="number" id="stock-{{ product.id }}" name="stock" value="{{ product.stock }}" min="0" required>
+        </div>
+
+        <div class="field-row">
+            <label for="price-{{ product.id }}">Preço (€)</label>
+            <input type="text" id="price-{{ product.id }}" name="price" value="{{ '%.2f'|format(product.price_cents/100) }}" required>
+        </div>
+
+        <div class="field-row">
+            <label for="description-{{ product.id }}">Conteúdo do kit / descrição</label>
+            <textarea id="description-{{ product.id }}" name="description" rows="4" required>{{ product.description }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar alterações</button>
+    </form>
+</div>
+{% endfor %}
+{% endblock %}

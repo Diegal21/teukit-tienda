@@ -67,6 +67,15 @@ Por defecto, Railway borra el sistema de archivos con cada despliegue — eso si
 
 ⚠️ Si ya tenías pedidos de prueba antes de configurar esto, se perderán una vez apliques el volumen (porque cambia de dónde lee la base de datos). Es buen momento para "empezar de cero" con datos reales.
 
+## Gestión de stock y productos
+
+En `/admin/produtos` (dentro del panel de administración) puedes editar por cada producto:
+- **Stock disponible** — cuando llega a 0, el producto se muestra como "Esgotado" en la tienda y no se puede comprar
+- **Precio**
+- **Descripción / contenido del kit**
+
+Los cambios se aplican al instante en la tienda pública.
+
 ## Panel de pedidos (administración)
 
 Para ver los pedidos que van llegando y marcarlos como enviados:

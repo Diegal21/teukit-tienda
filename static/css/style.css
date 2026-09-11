@@ -155,6 +155,14 @@ a { text-decoration: none; color: inherit; }
     margin-bottom: 14px;
 }
 .price-large { font-size: 1.8rem; }
+.out-of-stock {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #999;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+}
 
 /* BUTTONS */
 .btn {
@@ -349,6 +357,31 @@ a { text-decoration: none; color: inherit; }
     border-radius: 8px;
     border: 1px solid #ccc;
 }
+.product-edit-form {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.field-row label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--azul-marino);
+}
+.field-row input, .field-row textarea {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+}
+.admin-header div { display: flex; gap: 10px; }
 
 /* RESPONSIVE */
 @media (max-width: 700px) {

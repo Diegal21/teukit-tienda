@@ -206,10 +206,17 @@ def cart_add(product_id):
     product = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
     if not product:
         return "Producto no encontrado", 404
+    if product['stock'] <= 0:
+        flash(f'"{product["name"]}" está esgotado.', 'error')
+        return redirect(request.referrer or url_for('home'))
     qty = int(request.form.get('quantity', 1))
     cart = get_cart()
     key = str(product_id)
-    cart[key] = cart.get(key, 0) + qty
+    new_qty = cart.get(key, 0) + qty
+    if new_qty > product['stock']:
+        new_qty = product['stock']
+        flash(f'Apenas {product["stock"]} unidades disponíveis de "{product["name"]}".', 'error')
+    cart[key] = new_qty
     save_cart(cart)
     flash(f'"{product["name"]}" añadido al carrito.', 'success')
     return redirect(request.referrer or url_for('home'))
@@ -426,6 +433,45 @@ def admin_update_status(order_id):
     db.commit()
     flash(f'Pedido #{order_id} actualizado a "{new_status}".', 'success')
     return redirect(url_for('admin_orders'))
+
+
+@app.route('/admin/produtos')
+@admin_required
+def admin_products():
+    db = get_db()
+    products = db.execute('SELECT * FROM product ORDER BY id').fetchall()
+    return render_template('admin_products.html', products=products)
+
+
+@app.route('/admin/produtos/<int:product_id>/editar', methods=['POST'])
+@admin_required
+def admin_update_product(product_id):
+    stock = request.form.get('stock', '').strip()
+    description = request.form.get('description', '').strip()
+    price_str = request.form.get('price', '').strip()
+
+    if not stock.isdigit():
+        flash('El stock debe ser un número válido.', 'error')
+        return redirect(url_for('admin_products'))
+
+    if not description:
+        flash('La descripción no puede estar vacía.', 'error')
+        return redirect(url_for('admin_products'))
+
+    try:
+        price_cents = round(float(price_str.replace(',', '.')) * 100)
+    except ValueError:
+        flash('El precio no es válido.', 'error')
+        return redirect(url_for('admin_products'))
+
+    db = get_db()
+    db.execute(
+        'UPDATE product SET stock = ?, description = ?, price_cents = ? WHERE id = ?',
+        (int(stock), description, price_cents, product_id)
+    )
+    db.commit()
+    flash('Producto actualizado correctamente.', 'success')
+    return redirect(url_for('admin_products'))
 
 
 # ----------------------------
