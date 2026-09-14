@@ -4,7 +4,7 @@
 {% block content %}
 <section class="product-detail">
     <div class="product-detail-img">
-        <img src="{{ url_for('static', filename='img/' + product.image) }}" alt="{{ product.name }}">
+        <img src="{{ image_url(product) }}" alt="{{ product.name }}">
     </div>
     <div class="product-detail-info">
         <h1>{{ product.name }}</h1>

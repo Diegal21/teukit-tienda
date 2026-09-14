@@ -1,17 +1,28 @@
 import os
 import sqlite3
 import threading
+import re
+import uuid
 import requests
-from flask import Flask, render_template, redirect, url_for, session, request, flash, g
+from flask import Flask, render_template, redirect, url_for, session, request, flash, g, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # DB_PATH es configurable por variable de entorno para poder apuntar a un
 # volumen persistente en Railway (ver README para instrucciones de montaje).
 DB_PATH = os.environ.get('DB_PATH', os.path.join(basedir, 'teukit.db'))
 
+# Las imágenes subidas desde el panel de admin se guardan en el mismo
+# volumen persistente que la base de datos, para que no se pierdan con
+# cada despliegue.
+UPLOAD_FOLDER = os.path.join(os.path.dirname(DB_PATH), 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'cambia-esta-clave-en-produccion')
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB máximo por imagen
 
 
 # ----------------------------
@@ -105,6 +116,22 @@ def price_display(cents):
     return f"{cents/100:.2f}".replace('.', ',') + " €"
 
 
+def slugify(text):
+    text = text.lower().strip()
+    replacements = {
+        'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a',
+        'é': 'e', 'ê': 'e',
+        'í': 'i',
+        'ó': 'o', 'ô': 'o', 'õ': 'o',
+        'ú': 'u', 'ü': 'u',
+        'ç': 'c', 'ñ': 'n',
+    }
+    for accented, plain in replacements.items():
+        text = text.replace(accented, plain)
+    text = re.sub(r'[^a-z0-9]+', '-', text)
+    return text.strip('-')
+
+
 # ----------------------------
 # FUNCIONES DEL CARRITO (guardado en sesión)
 # ----------------------------
@@ -137,7 +164,22 @@ def get_cart_items():
     return items, total_cents
 
 
-app.jinja_env.globals.update(price_display=price_display)
+def image_url(product):
+    """Las imágenes originales del catálogo viven en static/img (parte del
+    código). Las imágenes subidas desde el panel de admin se guardan como
+    'uploads/archivo.jpg' y se sirven desde el volumen persistente."""
+    image = product['image']
+    if image.startswith('uploads/'):
+        return url_for('serve_upload', filename=image[len('uploads/'):])
+    return url_for('static', filename='img/' + image)
+
+
+app.jinja_env.globals.update(price_display=price_display, image_url=image_url)
+
+
+@app.route('/uploads/<path:filename>')
+def serve_upload(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 # Contraseña del panel de administración.
 # En Railway, configúrala como variable de entorno ADMIN_PASSWORD para no
@@ -591,19 +633,82 @@ def admin_products():
     return render_template('admin_products.html', products=products)
 
 
+def save_uploaded_image(file_storage):
+    """Guarda una imagen subida en el volumen persistente y devuelve el
+    valor a guardar en la columna 'image' (con el prefijo 'uploads/').
+    Devuelve None si no se subió ningún archivo."""
+    if not file_storage or file_storage.filename == '':
+        return None
+
+    filename = secure_filename(file_storage.filename)
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        raise ValueError('Formato de imagen no permitido. Usa PNG, JPG o WEBP.')
+
+    unique_name = f"{uuid.uuid4().hex}.{ext}"
+    file_storage.save(os.path.join(UPLOAD_FOLDER, unique_name))
+    return f"uploads/{unique_name}"
+
+
+@app.route('/admin/produtos/novo', methods=['GET', 'POST'])
+@admin_required
+def admin_new_product():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        price_str = request.form.get('price', '').strip()
+        description = request.form.get('description', '').strip()
+        stock = request.form.get('stock', '').strip()
+
+        if not name or not description or not stock.isdigit():
+            flash('Preenche todos os campos corretamente.', 'error')
+            return render_template('admin_product_form.html', mode='new')
+
+        try:
+            price_cents = round(float(price_str.replace(',', '.')) * 100)
+        except ValueError:
+            flash('El precio no es válido.', 'error')
+            return render_template('admin_product_form.html', mode='new')
+
+        db = get_db()
+        base_slug = slugify(name)
+        slug = base_slug
+        counter = 2
+        while db.execute('SELECT id FROM product WHERE slug = ?', (slug,)).fetchone():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        try:
+            image_value = save_uploaded_image(request.files.get('image'))
+        except ValueError as e:
+            flash(str(e), 'error')
+            return render_template('admin_product_form.html', mode='new')
+
+        if not image_value:
+            flash('Selecciona una imagen para el producto.', 'error')
+            return render_template('admin_product_form.html', mode='new')
+
+        db.execute('''
+            INSERT INTO product (name, slug, price_cents, description, image, stock, active)
+            VALUES (?, ?, ?, ?, ?, ?, 1)
+        ''', (name, slug, price_cents, description, image_value, int(stock)))
+        db.commit()
+        flash(f'Produto "{name}" criado com sucesso.', 'success')
+        return redirect(url_for('admin_products'))
+
+    return render_template('admin_product_form.html', mode='new')
+
+
 @app.route('/admin/produtos/<int:product_id>/editar', methods=['POST'])
 @admin_required
 def admin_update_product(product_id):
+    name = request.form.get('name', '').strip()
     stock = request.form.get('stock', '').strip()
     description = request.form.get('description', '').strip()
     price_str = request.form.get('price', '').strip()
+    active = 1 if request.form.get('active') == 'on' else 0
 
-    if not stock.isdigit():
-        flash('El stock debe ser un número válido.', 'error')
-        return redirect(url_for('admin_products'))
-
-    if not description:
-        flash('La descripción no puede estar vacía.', 'error')
+    if not name or not stock.isdigit() or not description:
+        flash('Preenche todos os campos corretamente.', 'error')
         return redirect(url_for('admin_products'))
 
     try:
@@ -612,11 +717,23 @@ def admin_update_product(product_id):
         flash('El precio no es válido.', 'error')
         return redirect(url_for('admin_products'))
 
+    try:
+        new_image = save_uploaded_image(request.files.get('image'))
+    except ValueError as e:
+        flash(str(e), 'error')
+        return redirect(url_for('admin_products'))
+
     db = get_db()
-    db.execute(
-        'UPDATE product SET stock = ?, description = ?, price_cents = ? WHERE id = ?',
-        (int(stock), description, price_cents, product_id)
-    )
+    if new_image:
+        db.execute(
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, new_image, product_id)
+        )
+    else:
+        db.execute(
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, product_id)
+        )
     db.commit()
     flash('Producto actualizado correctamente.', 'success')
     return redirect(url_for('admin_products'))

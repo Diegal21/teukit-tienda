@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Novo produto — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Novo produto</h1>
+    <a href="{{ url_for('admin_products') }}" class="btn btn-small">Voltar</a>
+</div>
+
+<div class="order-card">
+    <form action="{{ url_for('admin_new_product') }}" method="POST" enctype="multipart/form-data" class="product-edit-form">
+        <div class="field-row">
+            <label for="name">Nome do produto</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="field-row">
+            <label for="price">Preço (€)</label>
+            <input type="text" id="price" name="price" placeholder="ex: 39,90" required>
+        </div>
+
+        <div class="field-row">
+            <label for="stock">Stock inicial</label>
+            <input type="number" id="stock" name="stock" min="0" value="10" required>
+        </div>
+
+        <div class="field-row">
+            <label for="description">Conteúdo do kit / descrição</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+
+        <div class="field-row">
+            <label for="image">Imagem do produto</label>
+            <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/webp" required>
+            <small class="field-hint">Formatos aceites: PNG, JPG, WEBP. Máximo 5MB.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Criar produto</button>
+    </form>
+</div>
+{% endblock %}

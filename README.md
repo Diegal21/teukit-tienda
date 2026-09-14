@@ -95,6 +95,15 @@ Por defecto, Railway borra el sistema de archivos con cada despliegue — eso si
 
 ⚠️ Si ya tenías pedidos de prueba antes de configurar esto, se perderán una vez apliques el volumen (porque cambia de dónde lee la base de datos). Es buen momento para "empezar de cero" con datos reales.
 
+## Crear y editar productos (con imagen)
+
+En `/admin/produtos` puedes:
+- Hacer clic en **"+ Novo produto"** para agregar un kit nuevo: nombre, precio, stock, descripción e imagen
+- Editar cualquier producto existente: nombre, precio, stock, descripción, imagen (opcional, solo si quieres reemplazarla) y si está **activo** (visible en la tienda) o no
+- Desmarcar "Produto ativo" oculta el producto de la tienda sin borrarlo — útil para retirarlo temporalmente sin perder su historial de pedidos
+
+Las imágenes se guardan en el mismo volumen persistente que la base de datos, así que no se pierden con cada despliegue (siempre que ya hayas configurado el volumen, ver más abajo).
+
 ## Gestión de stock y productos
 
 En `/admin/produtos` (dentro del panel de administración) puedes editar por cada producto:

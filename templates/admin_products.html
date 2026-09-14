@@ -5,6 +5,7 @@
 <div class="admin-header">
     <h1>Produtos</h1>
     <div>
+        <a href="{{ url_for('admin_new_product') }}" class="btn btn-primary btn-small">+ Novo produto</a>
         <a href="{{ url_for('admin_orders') }}" class="btn btn-small">Ver pedidos</a>
         <a href="{{ url_for('admin_logout') }}" class="btn btn-small">Sair</a>
     </div>
@@ -14,12 +15,21 @@
 <div class="order-card">
     <div class="order-card-header">
         <strong>{{ product.name }}</strong>
-        <span class="status-badge {% if product.stock > 0 %}status-enviado{% else %}status-pendiente{% endif %}">
-            {% if product.stock > 0 %}{{ product.stock }} em stock{% else %}Esgotado{% endif %}
+        <span class="status-badge {% if not product.active %}status-pendiente{% elif product.stock > 0 %}status-enviado{% else %}status-pendiente{% endif %}">
+            {% if not product.active %}Inativo{% elif product.stock > 0 %}{{ product.stock }} em stock{% else %}Esgotado{% endif %}
         </span>
     </div>
 
-    <form action="{{ url_for('admin_update_product', product_id=product.id) }}" method="POST" class="product-edit-form">
+    <div class="product-preview">
+        <img src="{{ image_url(product) }}" alt="{{ product.name }}" class="product-thumb">
+    </div>
+
+    <form action="{{ url_for('admin_update_product', product_id=product.id) }}" method="POST" enctype="multipart/form-data" class="product-edit-form">
+        <div class="field-row">
+            <label for="name-{{ product.id }}">Nome do produto</label>
+            <input type="text" id="name-{{ product.id }}" name="name" value="{{ product.name }}" required>
+        </div>
+
         <div class="field-row">
             <label for="stock-{{ product.id }}">Stock disponível</label>
             <input type="number" id="stock-{{ product.id }}" name="stock" value="{{ product.stock }}" min="0" required>
@@ -33,6 +43,18 @@
         <div class="field-row">
             <label for="description-{{ product.id }}">Conteúdo do kit / descrição</label>
             <textarea id="description-{{ product.id }}" name="description" rows="4" required>{{ product.description }}</textarea>
+        </div>
+
+        <div class="field-row">
+            <label for="image-{{ product.id }}">Substituir imagem (opcional)</label>
+            <input type="file" id="image-{{ product.id }}" name="image" accept="image/png, image/jpeg, image/webp">
+        </div>
+
+        <div class="field-row-checkbox">
+            <label>
+                <input type="checkbox" name="active" {% if product.active %}checked{% endif %}>
+                Produto ativo (visível na loja)
+            </label>
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar alterações</button>
