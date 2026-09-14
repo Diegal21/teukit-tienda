@@ -229,6 +229,35 @@ def send_order_emails(order_id, name, email, address, phone, items, total_cents)
         send_email(ADMIN_NOTIFICATION_EMAIL, f"Novo pedido #{order_id} — {total_str}", admin_html)
 
 
+def send_status_update_email(order_id, name, email, new_status):
+    status_messages = {
+        'pagado': {
+            'subject': f"Pagamento confirmado — Pedido #{order_id} — TeuKit",
+            'heading': "💳 Pagamento confirmado!",
+            'body': f"Confirmámos o pagamento do teu pedido <strong>#{order_id}</strong>. Vamos preparar tudo para o envio."
+        },
+        'enviado': {
+            'subject': f"O teu pedido foi enviado — #{order_id} — TeuKit",
+            'heading': "📦 O teu pedido foi enviado!",
+            'body': f"O teu pedido <strong>#{order_id}</strong> já está a caminho. Obrigado por confiares na TeuKit!"
+        },
+    }
+
+    info = status_messages.get(new_status)
+    if not info:
+        return  # no se envía email para "pendiente" u otros estados
+
+    html = f"""
+    <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: #0f2d4f;">{info['heading']}</h2>
+        <p>Olá {name},</p>
+        <p>{info['body']}</p>
+        <p style="color: #888; font-size: 0.85rem;">TeuKit — Já tens o teu?</p>
+    </div>
+    """
+    send_email(email, info['subject'], html)
+
+
 def admin_required(view_func):
     from functools import wraps
 
@@ -536,8 +565,20 @@ def admin_update_status(order_id):
         return redirect(url_for('admin_orders'))
 
     db = get_db()
+    order = db.execute('SELECT * FROM "order" WHERE id = ?', (order_id,)).fetchone()
+    if not order:
+        flash('Pedido no encontrado.', 'error')
+        return redirect(url_for('admin_orders'))
+
     db.execute('UPDATE "order" SET status = ? WHERE id = ?', (new_status, order_id))
     db.commit()
+
+    threading.Thread(
+        target=send_status_update_email,
+        args=(order_id, order['customer_name'], order['customer_email'], new_status),
+        daemon=True
+    ).start()
+
     flash(f'Pedido #{order_id} actualizado a "{new_status}".', 'success')
     return redirect(url_for('admin_orders'))
 
