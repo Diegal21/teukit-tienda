@@ -218,6 +218,21 @@ a { text-decoration: none; color: inherit; }
 .flash-success { background: #e3f0d8; color: #3d5a24; }
 .flash-error { background: #fbe1dd; color: var(--vermelho); }
 
+/* HERO VIDEO */
+.hero-video-section {
+    display: flex;
+    justify-content: center;
+    padding: 30px 0 10px;
+}
+.hero-video {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15,45,79,0.18);
+}
+
 /* HERO */
 .hero {
     text-align: center;
