@@ -226,8 +226,8 @@ a { text-decoration: none; color: inherit; }
 }
 .hero-video {
     width: 100%;
-    max-width: 320px;
-    aspect-ratio: 9 / 16;
+    max-width: 900px;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 18px;
     box-shadow: 0 8px 24px rgba(15,45,79,0.18);
