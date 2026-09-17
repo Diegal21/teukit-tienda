@@ -95,6 +95,18 @@ Por defecto, Railway borra el sistema de archivos con cada despliegue — eso si
 
 ⚠️ Si ya tenías pedidos de prueba antes de configurar esto, se perderán una vez apliques el volumen (porque cambia de dónde lee la base de datos). Es buen momento para "empezar de cero" con datos reales.
 
+## Idiomas (multi-idioma)
+
+La tienda pública está disponible en 5 idiomas: portugués (por defecto), español, inglés, ucraniano y polaco. El selector está arriba a la derecha en el header.
+
+**Qué se traduce:** menús, botones, carrito, checkout, confirmación de pedido, guía, política de privacidad y términos y condiciones.
+
+**Qué NO se traduce automáticamente:** los nombres y descripciones de los productos que cargas desde `/admin/produtos` (vienen de la base de datos) y los emails de confirmación (siempre se envían en portugués). Si más adelante quieres que también se traduzcan, es una ampliación posible pero requiere guardar cada producto en varios idiomas.
+
+**Para añadir o editar un texto traducido:** todos los textos están en el archivo `translations.py`, organizados por clave (ej. `'cart.total'`). Cada clave tiene su versión en `pt`, `es`, `en`, `uk` y `pl`. Editar ahí actualiza el texto en todas las páginas que lo usan.
+
+**El panel de administración** (`/admin/...`) se mantiene siempre en portugués, ya que es de uso interno.
+
 ## Crear y editar productos (con imagen)
 
 En `/admin/produtos` puedes:

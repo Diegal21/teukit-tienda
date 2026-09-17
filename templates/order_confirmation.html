@@ -3,10 +3,10 @@
 
 {% block content %}
 <section class="confirmation">
-    <h1>✅ Obrigado, {{ order.customer_name }}!</h1>
-    <p>O teu pedido <strong>#{{ order.id }}</strong> foi registado com sucesso.</p>
-    <p>Total: <strong>{{ order.total_display }}</strong></p>
-    <p>Enviámos os detalhes para <strong>{{ order.customer_email }}</strong>. Entraremos em contacto brevemente para confirmar o pagamento e envio.</p>
-    <a href="{{ url_for('home') }}" class="btn btn-primary">Voltar à loja</a>
+    <h1>✅ {{ t('confirmation.thanks') }}, {{ order.customer_name }}!</h1>
+    <p>{{ t('confirmation.order_word') }} <strong>#{{ order.id }}</strong> {{ t('confirmation.order_registered') }}</p>
+    <p>{{ t('confirmation.total') }}: <strong>{{ order.total_display }}</strong></p>
+    <p>{{ t('confirmation.details_sent') }} <strong>{{ order.customer_email }}</strong>. {{ t('confirmation.contact_soon') }}</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">{{ t('confirmation.back_to_store') }}</a>
 </section>
 {% endblock %}

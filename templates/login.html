@@ -3,16 +3,16 @@
 
 {% block content %}
 <section class="auth-page">
-    <h1>Iniciar sessão</h1>
+    <h1>{{ t('auth.login_title') }}</h1>
     <form method="POST" class="checkout-form auth-form">
-        <label for="email">Email</label>
+        <label for="email">{{ t('auth.email') }}</label>
         <input type="email" id="email" name="email" required autofocus>
 
-        <label for="password">Palavra-passe</label>
+        <label for="password">{{ t('auth.password') }}</label>
         <input type="password" id="password" name="password" required>
 
-        <button type="submit" class="btn btn-primary btn-large">Entrar</button>
+        <button type="submit" class="btn btn-primary btn-large">{{ t('auth.login_button') }}</button>
     </form>
-    <p class="auth-switch">Ainda não tens conta? <a href="{{ url_for('register') }}">Criar conta</a></p>
+    <p class="auth-switch">{{ t('auth.no_account') }} <a href="{{ url_for('register') }}">{{ t('auth.create_account_link') }}</a></p>
 </section>
 {% endblock %}

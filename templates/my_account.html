@@ -3,22 +3,22 @@
 
 {% block content %}
 <div class="admin-header">
-    <h1>Olá, {{ user.name }}</h1>
-    <a href="{{ url_for('logout') }}" class="btn btn-small">Sair</a>
+    <h1>{{ t('account.hello') }}, {{ user.name }}</h1>
+    <a href="{{ url_for('logout') }}" class="btn btn-small">{{ t('nav.logout') }}</a>
 </div>
 
-<h2 class="section-subtitle">Os meus pedidos</h2>
+<h2 class="section-subtitle">{{ t('account.my_orders') }}</h2>
 
 {% if orders_with_items|length == 0 %}
-    <p>Ainda não fizeste nenhum pedido.</p>
-    <a href="{{ url_for('home') }}" class="btn btn-primary">Ver produtos</a>
+    <p>{{ t('account.no_orders') }}</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">{{ t('cart.view_products') }}</a>
 {% else %}
     {% for entry in orders_with_items %}
     {% set order = entry.order %}
     <div class="order-card">
         <div class="order-card-header">
             <div>
-                <strong>Pedido #{{ order.id }}</strong>
+                <strong>{{ t('account.order_label') }} #{{ order.id }}</strong>
                 <span class="order-date">{{ order.created_at }}</span>
             </div>
             <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
@@ -29,7 +29,7 @@
                 <li>{{ item.quantity }}x {{ item.product_name }} — {{ price_display(item.unit_price_cents * item.quantity) }}</li>
                 {% endfor %}
             </ul>
-            <p class="order-total"><strong>Total: {{ price_display(order.total_cents) }}</strong></p>
+            <p class="order-total"><strong>{{ t('cart.total') }}: {{ price_display(order.total_cents) }}</strong></p>
         </div>
     </div>
     {% endfor %}

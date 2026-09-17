@@ -12,13 +12,13 @@
         <p class="description">{{ product.description }}</p>
 
         <form action="{{ url_for('cart_add', product_id=product.id) }}" method="POST" class="add-to-cart-form">
-            <label for="quantity">Quantidade:</label>
+            <label for="quantity">{{ t('product.quantity') }}:</label>
             {% if product.stock > 0 %}
                 <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
-                <button type="submit" class="btn btn-primary btn-large">Adicionar ao carrinho</button>
+                <button type="submit" class="btn btn-primary btn-large">{{ t('product.add_to_cart') }}</button>
             {% else %}
                 <input type="number" id="quantity" value="0" disabled>
-                <button type="button" class="btn btn-large" disabled>Esgotado</button>
+                <button type="button" class="btn btn-large" disabled>{{ t('product.sold_out') }}</button>
             {% endif %}
         </form>
     </div>

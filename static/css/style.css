@@ -45,6 +45,45 @@ a { text-decoration: none; color: inherit; }
     align-items: center;
     gap: 20px;
 }
+.lang-switcher {
+    position: relative;
+}
+.lang-current {
+    background: rgba(255,255,255,0.12);
+    color: var(--branco);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.lang-current:hover { background: rgba(255,255,255,0.22); }
+.lang-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+    background: var(--branco);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    overflow: hidden;
+    min-width: 60px;
+    z-index: 20;
+}
+.lang-switcher:hover .lang-dropdown,
+.lang-switcher:focus-within .lang-dropdown {
+    display: block;
+}
+.lang-dropdown a {
+    display: block;
+    padding: 8px 14px;
+    color: var(--azul-marino);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.lang-dropdown a:hover { background: var(--fundo); }
 .account-link {
     color: var(--branco);
     font-weight: 600;

@@ -14,15 +14,23 @@
             <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="TeuKit" class="logo-img">
         </a>
         <div class="header-links">
-            <a href="{{ url_for('guide') }}" class="account-link">Guia</a>
+            <div class="lang-switcher">
+                <button type="button" class="lang-current">{{ language_labels[current_lang()] }} ▾</button>
+                <div class="lang-dropdown">
+                    {% for code in supported_languages %}
+                        <a href="{{ url_for('set_language', lang_code=code) }}">{{ language_labels[code] }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <a href="{{ url_for('guide') }}" class="account-link">{{ t('nav.guide') }}</a>
             {% if current_user %}
                 <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>
-                <a href="{{ url_for('logout') }}" class="account-link">Sair</a>
+                <a href="{{ url_for('logout') }}" class="account-link">{{ t('nav.logout') }}</a>
             {% else %}
-                <a href="{{ url_for('login') }}" class="account-link">Iniciar sessão</a>
+                <a href="{{ url_for('login') }}" class="account-link">{{ t('nav.login') }}</a>
             {% endif %}
             <a href="{{ url_for('cart_view') }}" class="cart-link">
-                🛒 Carrinho
+                🛒 {{ t('nav.cart') }}
                 {% set cart = session.get('cart', {}) %}
                 {% if cart %}
                     <span class="cart-badge">{{ cart.values() | sum }}</span>
@@ -49,10 +57,10 @@
 <footer class="site-footer">
     <div class="container">
         <div class="footer-links">
-            <a href="{{ url_for('privacy_policy') }}">Política de Privacidade</a>
-            <a href="{{ url_for('terms') }}">Termos e Condições</a>
+            <a href="{{ url_for('privacy_policy') }}">{{ t('footer.privacy') }}</a>
+            <a href="{{ url_for('terms') }}">{{ t('footer.terms') }}</a>
         </div>
-        <p>&copy; {{ 2026 }} TeuKit — Já tens o teu?</p>
+        <p>&copy; {{ 2026 }} TeuKit — {{ t('footer.tagline') }}</p>
     </div>
 </footer>
 

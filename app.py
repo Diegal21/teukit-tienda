@@ -7,6 +7,7 @@ import requests
 from flask import Flask, render_template, redirect, url_for, session, request, flash, g, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from translations import translate
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # DB_PATH es configurable por variable de entorno para poder apuntar a un
@@ -175,6 +176,28 @@ def image_url(product):
 
 
 app.jinja_env.globals.update(price_display=price_display, image_url=image_url)
+
+SUPPORTED_LANGUAGES = ['pt', 'es', 'en', 'uk', 'pl']
+LANGUAGE_LABELS = {'pt': 'PT', 'es': 'ES', 'en': 'EN', 'uk': 'UK', 'pl': 'PL'}
+
+
+def get_lang():
+    lang = session.get('lang', 'pt')
+    return lang if lang in SUPPORTED_LANGUAGES else 'pt'
+
+
+def t(key):
+    return translate(key, get_lang())
+
+
+app.jinja_env.globals.update(t=t, current_lang=get_lang, supported_languages=SUPPORTED_LANGUAGES, language_labels=LANGUAGE_LABELS)
+
+
+@app.route('/idioma/<lang_code>')
+def set_language(lang_code):
+    if lang_code in SUPPORTED_LANGUAGES:
+        session['lang'] = lang_code
+    return redirect(request.referrer or url_for('home'))
 
 
 @app.route('/uploads/<path:filename>')
@@ -363,12 +386,16 @@ def guide():
 
 @app.route('/privacidade')
 def privacy_policy():
-    return render_template('privacy.html')
+    lang = get_lang()
+    template = 'privacy.html' if lang == 'pt' else f'privacy_{lang}.html'
+    return render_template(template)
 
 
 @app.route('/termos')
 def terms():
-    return render_template('terms.html')
+    lang = get_lang()
+    template = 'terms.html' if lang == 'pt' else f'terms_{lang}.html'
+    return render_template(template)
 
 
 @app.route('/carrito/agregar/<int:product_id>', methods=['POST'])

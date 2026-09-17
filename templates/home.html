@@ -10,8 +10,8 @@
 </section>
 
 <section class="hero">
-    <h1>Já tens o teu KIT de emergência?</h1>
-    <p>Tudo o que precisas para os primeiros minutos que importam.</p>
+    <h1>{{ t('home.hero_title') }}</h1>
+    <p>{{ t('home.hero_subtitle') }}</p>
 </section>
 
 <section class="product-grid">
@@ -24,9 +24,9 @@
             <h2>{{ product.name }}</h2>
             <p class="price">{{ price_display(product.price_cents) }}</p>
             {% if product.stock > 0 %}
-                <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary">Ver produto</a>
+                <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary">{{ t('home.view_product') }}</a>
             {% else %}
-                <span class="out-of-stock">Esgotado</span>
+                <span class="out-of-stock">{{ t('home.sold_out') }}</span>
             {% endif %}
         </div>
     </div>

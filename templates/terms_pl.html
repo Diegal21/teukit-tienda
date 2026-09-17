@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Regulamin — TeuKit{% endblock %}
+
+{% block content %}
+<section class="legal-page">
+    <h1>Regulamin sprzedaży</h1>
+    <p class="legal-updated">Ostatnia aktualizacja: [DATA]</p>
+
+    <div class="legal-placeholder-notice">
+        ⚠️ Ten dokument zawiera pola w nawiasach <code>[TAK]</code>, które należy uzupełnić rzeczywistymi danymi Twojej firmy przed oficjalną publikacją sklepu.
+    </div>
+
+    <h2>1. Identyfikacja sprzedawcy</h2>
+    <ul>
+        <li><strong>Imię i nazwisko/Nazwa firmy:</strong> [PEŁNE IMIĘ I NAZWISKO LUB NAZWA FIRMY]</li>
+        <li><strong>NIP:</strong> [NUMER IDENTYFIKACJI PODATKOWEJ]</li>
+        <li><strong>Adres:</strong> [PEŁNY ADRES]</li>
+        <li><strong>Email kontaktowy:</strong> [EMAIL KONTAKTOWY]</li>
+    </ul>
+
+    <h2>2. Produkty i ceny</h2>
+    <p>
+        Ceny podane na stronie wyrażone są w euro (€) i zawierają VAT według
+        obowiązującej stawki, chyba że wskazano inaczej. Zastrzegamy sobie prawo do
+        zmiany cen w dowolnym momencie, bez wpływu na już potwierdzone zamówienia.
+    </p>
+
+    <h2>3. Proces zamówienia</h2>
+    <p>
+        Po sfinalizowaniu zakupu otrzymasz potwierdzenie zamówienia. Zamówienie
+        zostaje zarejestrowane ze statusem "oczekujące" do momentu potwierdzenia
+        płatności przez sprzedawcę.
+    </p>
+
+    <h2>4. Metody płatności</h2>
+    <p>
+        [OPISAĆ DOSTĘPNE METODY PŁATNOŚCI — np.: przelew bankowy, karta przez
+        Stripe/SumUp, MB WAY itp. Zaktualizuj tę sekcję po aktywacji płatności online.]
+    </p>
+
+    <h2>5. Wysyłka i dostawa</h2>
+    <p>
+        [OPISAĆ CZASY WYSYŁKI, STREFY DOSTAWY (np. Portugalia, Hiszpania,
+        reszta Europy) I KOSZTY WYSYŁKI.]
+    </p>
+
+    <h2>6. Prawo odstąpienia od umowy (zwroty)</h2>
+    <p>
+        Zgodnie z europejskim prawem ochrony konsumentów masz prawo odstąpić od umowy
+        zakupu bez podawania przyczyny, w terminie <strong>14 dni</strong> od
+        otrzymania produktu.
+    </p>
+    <p>
+        Aby skorzystać z tego prawa, skontaktuj się z nami pod adresem [EMAIL
+        KONTAKTOWY]. Produkt należy zwrócić w stanie, w jakim został otrzymany,
+        wraz z oryginalnym opakowaniem, jeśli to możliwe. Koszty zwrotu ponosi
+        klient, chyba że wskazano inaczej.
+    </p>
+    <p>
+        Prawo to nie ma zastosowania do produktów, które ze względów higienicznych
+        lub zdrowotnych zostały rozpieczętowane po dostawie (np. maski, materiały
+        pierwszej pomocy), jeśli zostały otwarte.
+    </p>
+
+    <h2>7. Gwarancja</h2>
+    <p>
+        Sprzedawane produkty objęte są ustawową gwarancją zgodności przewidzianą
+        w obowiązujących przepisach portugalskich i europejskich.
+    </p>
+
+    <h2>8. Ograniczenie odpowiedzialności</h2>
+    <p>
+        Zestawy awaryjne sprzedawane na tej stronie mają na celu wsparcie w sytuacjach
+        awaryjnych, ale nie zastępują profesjonalnej pomocy medycznej ani ratunkowej.
+        W przypadku prawdziwej sytuacji awaryjnej zawsze skontaktuj się z numerem
+        alarmowym (112).
+    </p>
+
+    <h2>9. Rozwiązywanie sporów</h2>
+    <p>
+        W przypadku sporu konsument może skorzystać z podmiotu Alternatywnego
+        Rozwiązywania Sporów Konsumenckich lub złożyć skargę za pośrednictwem
+        Europejskiej Platformy Internetowego Rozstrzygania Sporów:
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.
+    </p>
+
+    <h2>10. Prawo właściwe</h2>
+    <p>
+        Niniejszy Regulamin podlega prawu portugalskiemu, bez uszczerbku dla
+        bezwzględnie obowiązujących praw ochrony konsumentów obowiązujących w kraju
+        zamieszkania klienta, jeśli znajduje się on w Unii Europejskiej.
+    </p>
+</section>
+{% endblock %}

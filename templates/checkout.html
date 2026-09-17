@@ -2,38 +2,37 @@
 {% block title %}Finalizar compra — TeuKit{% endblock %}
 
 {% block content %}
-<h1>Finalizar compra</h1>
+<h1>{{ t('checkout.title') }}</h1>
 
 <div class="checkout-layout">
     <div class="checkout-summary">
-        <h2>Resumo do pedido</h2>
+        <h2>{{ t('checkout.summary') }}</h2>
         <ul class="summary-list">
             {% for item in items %}
             <li>{{ item.quantity }}x {{ item.product.name }} — {{ item.subtotal_display }}</li>
             {% endfor %}
         </ul>
-        <p class="cart-total"><strong>Total: {{ total_display }}</strong></p>
+        <p class="cart-total"><strong>{{ t('cart.total') }}: {{ total_display }}</strong></p>
     </div>
 
     <form method="POST" class="checkout-form">
-        <label for="name">Nome completo *</label>
+        <label for="name">{{ t('checkout.full_name') }} *</label>
         <input type="text" id="name" name="name" value="{{ current_user.name if current_user else '' }}" required>
 
-        <label for="email">Email *</label>
+        <label for="email">{{ t('checkout.email') }} *</label>
         <input type="email" id="email" name="email" value="{{ current_user.email if current_user else '' }}" required>
 
-        <label for="phone">Telefone</label>
+        <label for="phone">{{ t('checkout.phone') }}</label>
         <input type="tel" id="phone" name="phone">
 
-        <label for="address">Morada de envio *</label>
+        <label for="address">{{ t('checkout.address') }} *</label>
         <textarea id="address" name="address" rows="3" required></textarea>
 
         <p class="payment-note">
-            💳 O pagamento online será ativado brevemente.
-            Por agora, o teu pedido fica registado e entraremos em contacto para confirmar o pagamento.
+            💳 {{ t('checkout.payment_note') }}
         </p>
 
-        <button type="submit" class="btn btn-primary btn-large">Confirmar pedido</button>
+        <button type="submit" class="btn btn-primary btn-large">{{ t('checkout.confirm') }}</button>
     </form>
 </div>
 {% endblock %}

@@ -3,61 +3,57 @@
 
 {% block content %}
 <section class="guide-page">
-    <h1>Guia de utilização e recomendações</h1>
-    <p class="guide-intro">
-        Preparar-te para uma emergência começa por conhecer bem o teu kit.
-        Reunimos aqui as informações essenciais sobre como usar cada item do
-        teu KIT Essencial e algumas recomendações gerais de segurança.
-    </p>
+    <h1>{{ t('guide.title') }}</h1>
+    <p class="guide-intro">{{ t('guide.intro') }}</p>
 
     <div class="guide-download-card">
         <div class="guide-download-icon">📄</div>
         <div>
-            <h3>Guia completo em PDF</h3>
-            <p>Conteúdo do kit, instruções de utilização e contactos úteis de emergência.</p>
+            <h3>{{ t('guide.download_title') }}</h3>
+            <p>{{ t('guide.download_desc') }}</p>
         </div>
         <a href="{{ url_for('static', filename='downloads/guia-kit-essencial-teukit.pdf') }}"
-           class="btn btn-primary" download>Descarregar PDF</a>
+           class="btn btn-primary" download>{{ t('guide.download_button') }}</a>
     </div>
 
     <div class="guide-grid">
         <div class="guide-item">
-            <h3>🎒 Mochila impermeável</h3>
-            <p>Fácil de transportar e localizar rapidamente. Mantém-na sempre num local acessível da tua casa ou viatura.</p>
+            <h3>{{ t('guide.item1_title') }}</h3>
+            <p>{{ t('guide.item1_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>🩹 Kit de primeiros socorros</h3>
-            <p>Material básico para desinfetar e cobrir pequenos ferimentos. Verifica o prazo de validade a cada 6 meses.</p>
+            <h3>{{ t('guide.item2_title') }}</h3>
+            <p>{{ t('guide.item2_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>🔦 Lanterna</h3>
-            <p>Testa as pilhas regularmente. Numa emergência, usa-a com moderação para prolongar a duração.</p>
+            <h3>{{ t('guide.item3_title') }}</h3>
+            <p>{{ t('guide.item3_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>😷 Máscaras FFP2</h3>
-            <p>Úteis em situações de fumo, poeira ou contenção sanitária. Substitui após cada uso prolongado.</p>
+            <h3>{{ t('guide.item4_title') }}</h3>
+            <p>{{ t('guide.item4_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>📯 Apito</h3>
-            <p>3 apitos curtos e repetidos são o sinal universal de pedido de socorro.</p>
+            <h3>{{ t('guide.item5_title') }}</h3>
+            <p>{{ t('guide.item5_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>💧 Água e snacks</h3>
-            <p>Reserva de emergência para as primeiras horas. Verifica e substitui antes da validade.</p>
+            <h3>{{ t('guide.item6_title') }}</h3>
+            <p>{{ t('guide.item6_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>🌡️ Manta térmica</h3>
-            <p>Ajuda a manter a temperatura corporal em situações de frio, choque ou exposição prolongada.</p>
+            <h3>{{ t('guide.item7_title') }}</h3>
+            <p>{{ t('guide.item7_desc') }}</p>
         </div>
         <div class="guide-item">
-            <h3>📋 Folhetos informativos</h3>
-            <p>Instruções resumidas para situações comuns de emergência — mantém-nos dentro da mochila.</p>
+            <h3>{{ t('guide.item8_title') }}</h3>
+            <p>{{ t('guide.item8_desc') }}</p>
         </div>
     </div>
 
     <div class="guide-emergency-box">
-        <h3>☎️ Contacto de emergência</h3>
-        <p>Em Portugal e Espanha, o número de emergência geral é o <strong>112</strong>. Usa-o sempre que a situação coloque em risco a vida ou a segurança de alguém.</p>
+        <h3>{{ t('guide.emergency_title') }}</h3>
+        <p>{{ t('guide.emergency_body') | safe }}</p>
     </div>
 </section>
 {% endblock %}
