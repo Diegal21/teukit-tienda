@@ -97,6 +97,12 @@ a { text-decoration: none; color: inherit; }
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.lang-current .fi, .lang-dropdown .fi {
+    border-radius: 2px;
 }
 .lang-current:hover { background: rgba(255,255,255,0.22); }
 .lang-dropdown {
@@ -117,7 +123,9 @@ a { text-decoration: none; color: inherit; }
     display: block;
 }
 .lang-dropdown a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 14px;
     color: var(--azul-marino);
     font-size: 0.85rem;

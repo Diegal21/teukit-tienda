@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}TeuKit — Já tens o teu?{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7/css/flag-icons.min.css">
 </head>
 <body>
 
@@ -17,10 +18,10 @@
 
         <div class="header-right">
             <div class="lang-switcher">
-                <button type="button" class="lang-current">{{ language_flags[current_lang()] }} {{ language_labels[current_lang()] }} ▾</button>
+                <button type="button" class="lang-current"><span class="fi fi-{{ language_flags[current_lang()] }}"></span> {{ language_labels[current_lang()] }} ▾</button>
                 <div class="lang-dropdown">
                     {% for code in supported_languages %}
-                        <a href="{{ url_for('set_language', lang_code=code) }}">{{ language_flags[code] }} {{ language_labels[code] }}</a>
+                        <a href="{{ url_for('set_language', lang_code=code) }}"><span class="fi fi-{{ language_flags[code] }}"></span> {{ language_labels[code] }}</a>
                     {% endfor %}
                 </div>
             </div>

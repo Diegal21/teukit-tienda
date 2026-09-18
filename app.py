@@ -179,7 +179,10 @@ app.jinja_env.globals.update(price_display=price_display, image_url=image_url)
 
 SUPPORTED_LANGUAGES = ['pt', 'es', 'en']
 LANGUAGE_LABELS = {'pt': 'PT', 'es': 'ES', 'en': 'EN'}
-LANGUAGE_FLAGS = {'pt': '🇵🇹', 'es': '🇪🇸', 'en': '🇬🇧'}
+# Códigos de país (ISO 3166-1 alpha-2) usados por la librería flag-icons
+# para dibujar la bandera como icono. Se usan en vez de emoji porque
+# Windows no renderiza los emoji de bandera (muestra las letras sueltas).
+LANGUAGE_FLAGS = {'pt': 'pt', 'es': 'es', 'en': 'gb'}
 
 
 def get_lang():
