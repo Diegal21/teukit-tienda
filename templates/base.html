@@ -12,33 +12,56 @@
     <div class="container header-inner">
         <a href="{{ url_for('home') }}" class="logo-link">
             <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="TeuKit" class="logo-img">
+            <span class="logo-text">TeuKit</span>
         </a>
-        <div class="header-links">
+
+        <div class="header-right">
             <div class="lang-switcher">
-                <button type="button" class="lang-current">{{ language_labels[current_lang()] }} ▾</button>
+                <button type="button" class="lang-current">{{ language_flags[current_lang()] }} {{ language_labels[current_lang()] }} ▾</button>
                 <div class="lang-dropdown">
                     {% for code in supported_languages %}
-                        <a href="{{ url_for('set_language', lang_code=code) }}">{{ language_labels[code] }}</a>
+                        <a href="{{ url_for('set_language', lang_code=code) }}">{{ language_flags[code] }} {{ language_labels[code] }}</a>
                     {% endfor %}
                 </div>
             </div>
-            <a href="{{ url_for('guide') }}" class="account-link">{{ t('nav.guide') }}</a>
-            {% if current_user %}
-                <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>
-                <a href="{{ url_for('logout') }}" class="account-link">{{ t('nav.logout') }}</a>
-            {% else %}
-                <a href="{{ url_for('login') }}" class="account-link">{{ t('nav.login') }}</a>
-            {% endif %}
-            <a href="{{ url_for('cart_view') }}" class="cart-link">
-                🛒 {{ t('nav.cart') }}
-                {% set cart = session.get('cart', {}) %}
-                {% if cart %}
-                    <span class="cart-badge">{{ cart.values() | sum }}</span>
+
+            <button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav class="header-links" id="headerLinks">
+                <a href="{{ url_for('guide') }}" class="account-link">{{ t('nav.guide') }}</a>
+                {% if current_user %}
+                    <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>
+                    <a href="{{ url_for('logout') }}" class="account-link">{{ t('nav.logout') }}</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="account-link">{{ t('nav.login') }}</a>
                 {% endif %}
-            </a>
+                <a href="{{ url_for('cart_view') }}" class="cart-link">
+                    🛒 {{ t('nav.cart') }}
+                    {% set cart = session.get('cart', {}) %}
+                    {% if cart %}
+                        <span class="cart-badge">{{ cart.values() | sum }}</span>
+                    {% endif %}
+                </a>
+            </nav>
         </div>
     </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggle = document.getElementById('menuToggle');
+        var links = document.getElementById('headerLinks');
+        if (toggle && links) {
+            toggle.addEventListener('click', function () {
+                var isOpen = links.classList.toggle('open');
+                toggle.classList.toggle('open', isOpen);
+                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+        }
+    });
+</script>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

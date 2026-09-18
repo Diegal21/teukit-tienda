@@ -29,16 +29,56 @@ a { text-decoration: none; color: inherit; }
 .site-header {
     background: var(--azul-marino);
     padding: 14px 0;
+    position: relative;
 }
 .header-inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .logo-img {
     height: 48px;
     border-radius: 8px;
 }
+.logo-text {
+    color: var(--branco);
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.3px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+}
+.menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: var(--branco);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.menu-toggle.open span:nth-child(2) { opacity: 0; }
+.menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
 .header-links {
     display: flex;
@@ -584,4 +624,34 @@ a { text-decoration: none; color: inherit; }
     .product-detail, .checkout-layout { grid-template-columns: 1fr; }
     .guide-download-card { flex-direction: column; text-align: center; }
     .guide-download-card .btn { margin-left: 0; }
+
+    .logo-text { font-size: 1.1rem; }
+
+    .menu-toggle { display: flex; }
+
+    .header-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        background: var(--azul-marino);
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 20px;
+        transition: max-height 0.25s ease, padding 0.25s ease;
+        z-index: 15;
+    }
+    .header-links.open {
+        max-height: 260px;
+        padding: 10px 20px 16px;
+    }
+    .header-links a {
+        width: 100%;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255,255,255,0.12);
+    }
+    .header-links a:first-child { border-top: none; }
 }

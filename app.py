@@ -177,8 +177,9 @@ def image_url(product):
 
 app.jinja_env.globals.update(price_display=price_display, image_url=image_url)
 
-SUPPORTED_LANGUAGES = ['pt', 'es', 'en', 'uk', 'pl']
-LANGUAGE_LABELS = {'pt': 'PT', 'es': 'ES', 'en': 'EN', 'uk': 'UK', 'pl': 'PL'}
+SUPPORTED_LANGUAGES = ['pt', 'es', 'en']
+LANGUAGE_LABELS = {'pt': 'PT', 'es': 'ES', 'en': 'EN'}
+LANGUAGE_FLAGS = {'pt': '🇵🇹', 'es': '🇪🇸', 'en': '🇬🇧'}
 
 
 def get_lang():
@@ -190,7 +191,7 @@ def t(key):
     return translate(key, get_lang())
 
 
-app.jinja_env.globals.update(t=t, current_lang=get_lang, supported_languages=SUPPORTED_LANGUAGES, language_labels=LANGUAGE_LABELS)
+app.jinja_env.globals.update(t=t, current_lang=get_lang, supported_languages=SUPPORTED_LANGUAGES, language_labels=LANGUAGE_LABELS, language_flags=LANGUAGE_FLAGS)
 
 
 @app.route('/idioma/<lang_code>')
