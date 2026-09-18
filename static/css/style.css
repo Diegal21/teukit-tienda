@@ -335,6 +335,74 @@ a { text-decoration: none; color: inherit; }
     color: #556677;
 }
 
+/* CATÁLOGO POR CATEGORÍAS (carrusel) */
+.category-carousel-section {
+    padding: 10px 0 40px;
+}
+.category-carousel-section .section-title {
+    text-align: center;
+    color: var(--azul-marino);
+    font-size: 1.6rem;
+    margin-bottom: 22px;
+}
+.category-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding: 4px 4px 14px;
+}
+.category-card {
+    position: relative;
+    flex: 0 0 240px;
+    height: 300px;
+    border-radius: 16px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    scroll-snap-align: start;
+    box-shadow: 0 8px 20px rgba(15,45,79,0.18);
+    text-decoration: none;
+}
+.category-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 18px;
+    background: linear-gradient(to top, rgba(10,20,35,0.85) 0%, rgba(10,20,35,0.35) 55%, rgba(10,20,35,0.05) 100%);
+    transition: background 0.25s ease;
+}
+.category-card-overlay h3 {
+    color: var(--branco);
+    font-size: 1.15rem;
+    margin: 0 0 6px;
+}
+.category-card-desc {
+    color: rgba(255,255,255,0.92);
+    font-size: 0.9rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.category-card:hover .category-card-overlay,
+.category-card:focus .category-card-overlay {
+    background: rgba(10,20,35,0.72);
+}
+.category-card:hover .category-card-desc,
+.category-card:focus .category-card-desc {
+    max-height: 80px;
+    opacity: 1;
+}
+.catalog-empty-msg {
+    text-align: center;
+    color: #556677;
+    padding: 40px 0 60px;
+    font-size: 1.05rem;
+}
+
 /* PRODUCT GRID */
 .product-grid {
     display: grid;

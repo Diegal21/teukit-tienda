@@ -8,6 +8,7 @@ TRANSLATIONS = {
 
     # --- Navegación y footer ---
     'nav.guide': {'pt': 'Guia', 'es': 'Guía', 'en': 'Guide'},
+    'nav.catalog': {'pt': 'Catálogo', 'es': 'Catálogo', 'en': 'Catalog'},
     'nav.login': {'pt': 'Iniciar sessão', 'es': 'Iniciar sesión', 'en': 'Log in'},
     'nav.logout': {'pt': 'Sair', 'es': 'Salir', 'en': 'Log out'},
     'nav.cart': {'pt': 'Carrinho', 'es': 'Carrito', 'en': 'Cart'},
@@ -18,6 +19,22 @@ TRANSLATIONS = {
     # --- Home ---
     'home.hero_title': {'pt': 'Já tens o teu KIT de emergência?', 'es': '¿Ya tienes tu KIT de emergencia?', 'en': 'Do you have your emergency KIT yet?'},
     'home.hero_subtitle': {'pt': 'Tudo o que precisas para os primeiros minutos que importam.', 'es': 'Todo lo que necesitas para los primeros minutos que importan.', 'en': 'Everything you need for the first crucial minutes.'},
+
+    # --- Catálogo por categorías ---
+    'catalog.section_title': {'pt': 'Escolhe o teu kit', 'es': 'Elige tu kit', 'en': 'Choose your kit'},
+    'catalog.page_title': {'pt': 'Catálogo TeuKit', 'es': 'Catálogo TeuKit', 'en': 'TeuKit Catalog'},
+    'catalog.page_subtitle': {'pt': 'Um kit para cada situação. Explora as categorias.', 'es': 'Un kit para cada situación. Explora las categorías.', 'en': 'A kit for every situation. Explore the categories.'},
+    'catalog.coming_soon': {'pt': 'Novos produtos desta categoria brevemente disponíveis.', 'es': 'Nuevos productos de esta categoría próximamente disponibles.', 'en': 'New products in this category coming soon.'},
+    'catalog.back_to_catalog': {'pt': 'Voltar ao catálogo', 'es': 'Volver al catálogo', 'en': 'Back to catalog'},
+
+    'category.kit_emergencia.name': {'pt': 'Kit de Emergência', 'es': 'Kit de Emergencia', 'en': 'Emergency Kit'},
+    'category.kit_emergencia.desc': {'pt': 'O essencial para os primeiros minutos que importam.', 'es': 'Lo esencial para los primeros minutos que importan.', 'en': 'The essentials for the first crucial minutes.'},
+    'category.kit_incendios.name': {'pt': 'Kit de Incêndios', 'es': 'Kit de Incendios', 'en': 'Fire Safety Kit'},
+    'category.kit_incendios.desc': {'pt': 'Preparação e proteção para situações de incêndio.', 'es': 'Preparación y protección para situaciones de incendio.', 'en': 'Preparation and protection for fire emergencies.'},
+    'category.kit_viajes.name': {'pt': 'Kit de Viagens', 'es': 'Kit de Viajes', 'en': 'Travel Kit'},
+    'category.kit_viajes.desc': {'pt': 'Leva a tua segurança contigo para onde fores.', 'es': 'Lleva tu seguridad contigo a donde vayas.', 'en': 'Take your safety with you wherever you go.'},
+    'category.kit_automovil.name': {'pt': 'Kit para Automóvel', 'es': 'Kit para Automóvil', 'en': 'Car Kit'},
+    'category.kit_automovil.desc': {'pt': 'Pronto para qualquer imprevisto na estrada.', 'es': 'Listo para cualquier imprevisto en la carretera.', 'en': 'Ready for any unexpected event on the road.'},
     'home.view_product': {'pt': 'Ver produto', 'es': 'Ver producto', 'en': 'View product'},
     'home.sold_out': {'pt': 'Esgotado', 'es': 'Agotado', 'en': 'Sold out'},
 

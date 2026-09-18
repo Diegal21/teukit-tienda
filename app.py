@@ -64,9 +64,16 @@ def init_db():
             description TEXT NOT NULL,
             image TEXT NOT NULL,
             stock INTEGER DEFAULT 100,
-            active INTEGER DEFAULT 1
+            active INTEGER DEFAULT 1,
+            category TEXT DEFAULT 'kit_emergencia'
         )
     ''')
+    # Migración: si el producto ya existía sin columna 'category' (bases de
+    # datos creadas antes de agregar el catálogo por categorías), la agrega.
+    try:
+        db.execute("ALTER TABLE product ADD COLUMN category TEXT DEFAULT 'kit_emergencia'")
+    except sqlite3.OperationalError:
+        pass  # la columna ya existe
     db.execute('''
         CREATE TABLE IF NOT EXISTS "order" (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,8 +101,8 @@ def init_db():
     existing = db.execute('SELECT COUNT(*) FROM product').fetchone()[0]
     if existing == 0:
         db.execute('''
-            INSERT INTO product (name, slug, price_cents, description, image, stock, active)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO product (name, slug, price_cents, description, image, stock, active, category)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             "KIT Essencial - Primeiros Socorros",
             "kit-essencial",
@@ -105,7 +112,8 @@ def init_db():
             "informativos com orientações sobre como agir em caso de emergência.",
             "kit-essencial.jpg",
             100,
-            1
+            1,
+            "kit_emergencia"
         ))
         print("Producto inicial 'KIT Essencial' creado.")
 
@@ -176,6 +184,25 @@ def image_url(product):
 
 
 app.jinja_env.globals.update(price_display=price_display, image_url=image_url)
+
+# ----------------------------
+# CATEGORÍAS DEL CATÁLOGO
+# ----------------------------
+
+CATEGORY_ORDER = ['kit_emergencia', 'kit_incendios', 'kit_viajes', 'kit_automovil']
+CATEGORY_IMAGES = {
+    'kit_emergencia': 'categoria-emergencia.jpg',
+    'kit_incendios': 'categoria-incendios.jpg',
+    'kit_viajes': 'categoria-viagens.jpg',
+    'kit_automovil': 'categoria-automovel.jpg',
+}
+
+
+def category_image_url(cat_slug):
+    return url_for('static', filename='img/' + CATEGORY_IMAGES.get(cat_slug, ''))
+
+
+app.jinja_env.globals.update(category_order=CATEGORY_ORDER, category_image_url=category_image_url)
 
 SUPPORTED_LANGUAGES = ['pt', 'es', 'en']
 LANGUAGE_LABELS = {'pt': 'PT', 'es': 'ES', 'en': 'EN'}
@@ -372,6 +399,22 @@ def home():
     db = get_db()
     products = db.execute('SELECT * FROM product WHERE active = 1').fetchall()
     return render_template('home.html', products=products)
+
+
+@app.route('/catalogo')
+def catalog():
+    return render_template('catalog.html')
+
+
+@app.route('/categoria/<cat_slug>')
+def category_view(cat_slug):
+    if cat_slug not in CATEGORY_ORDER:
+        return redirect(url_for('catalog'))
+    db = get_db()
+    products = db.execute(
+        'SELECT * FROM product WHERE category = ? AND active = 1', (cat_slug,)
+    ).fetchall()
+    return render_template('category.html', products=products, cat_slug=cat_slug)
 
 
 @app.route('/producto/<slug>')
@@ -689,8 +732,9 @@ def admin_new_product():
         price_str = request.form.get('price', '').strip()
         description = request.form.get('description', '').strip()
         stock = request.form.get('stock', '').strip()
+        category = request.form.get('category', '').strip()
 
-        if not name or not description or not stock.isdigit():
+        if not name or not description or not stock.isdigit() or category not in CATEGORY_ORDER:
             flash('Preenche todos os campos corretamente.', 'error')
             return render_template('admin_product_form.html', mode='new')
 
@@ -719,9 +763,9 @@ def admin_new_product():
             return render_template('admin_product_form.html', mode='new')
 
         db.execute('''
-            INSERT INTO product (name, slug, price_cents, description, image, stock, active)
-            VALUES (?, ?, ?, ?, ?, ?, 1)
-        ''', (name, slug, price_cents, description, image_value, int(stock)))
+            INSERT INTO product (name, slug, price_cents, description, image, stock, active, category)
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?)
+        ''', (name, slug, price_cents, description, image_value, int(stock), category))
         db.commit()
         flash(f'Produto "{name}" criado com sucesso.', 'success')
         return redirect(url_for('admin_products'))
@@ -737,8 +781,9 @@ def admin_update_product(product_id):
     description = request.form.get('description', '').strip()
     price_str = request.form.get('price', '').strip()
     active = 1 if request.form.get('active') == 'on' else 0
+    category = request.form.get('category', '').strip()
 
-    if not name or not stock.isdigit() or not description:
+    if not name or not stock.isdigit() or not description or category not in CATEGORY_ORDER:
         flash('Preenche todos os campos corretamente.', 'error')
         return redirect(url_for('admin_products'))
 
@@ -757,13 +802,13 @@ def admin_update_product(product_id):
     db = get_db()
     if new_image:
         db.execute(
-            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ? WHERE id = ?',
-            (name, int(stock), description, price_cents, active, new_image, product_id)
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ?, category = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, new_image, category, product_id)
         )
     else:
         db.execute(
-            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ? WHERE id = ?',
-            (name, int(stock), description, price_cents, active, product_id)
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, category = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, category, product_id)
         )
     db.commit()
     flash('Producto actualizado correctamente.', 'success')

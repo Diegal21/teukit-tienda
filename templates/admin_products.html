@@ -41,6 +41,16 @@
         </div>
 
         <div class="field-row">
+            <label for="category-{{ product.id }}">Categoria</label>
+            <select id="category-{{ product.id }}" name="category" required>
+                <option value="kit_emergencia" {% if product.category == 'kit_emergencia' %}selected{% endif %}>Kit de Emergência</option>
+                <option value="kit_incendios" {% if product.category == 'kit_incendios' %}selected{% endif %}>Kit de Incêndios</option>
+                <option value="kit_viajes" {% if product.category == 'kit_viajes' %}selected{% endif %}>Kit de Viagens</option>
+                <option value="kit_automovil" {% if product.category == 'kit_automovil' %}selected{% endif %}>Kit para Automóvel</option>
+            </select>
+        </div>
+
+        <div class="field-row">
             <label for="description-{{ product.id }}">Conteúdo do kit / descrição</label>
             <textarea id="description-{{ product.id }}" name="description" rows="4" required>{{ product.description }}</textarea>
         </div>

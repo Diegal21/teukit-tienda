@@ -1,21 +1,14 @@
 {% extends "base.html" %}
-{% block title %}TeuKit — Já tens o teu?{% endblock %}
+{% block title %}{{ t('category.' + cat_slug + '.name') }} — TeuKit{% endblock %}
 
 {% block content %}
-
-<section class="hero-video-section">
-    <video class="hero-video" autoplay muted loop playsinline>
-        <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
-    </video>
-</section>
-
 <section class="hero">
-    <h1>{{ t('home.hero_title') }}</h1>
-    <p>{{ t('home.hero_subtitle') }}</p>
+    <h1>{{ t('category.' + cat_slug + '.name') }}</h1>
+    <p>{{ t('category.' + cat_slug + '.desc') }}</p>
+    <a href="{{ url_for('catalog') }}" class="btn btn-small">← {{ t('catalog.back_to_catalog') }}</a>
 </section>
 
-{% include "_category_carousel.html" %}
-
+{% if products %}
 <section class="product-grid">
     {% for product in products %}
     <div class="product-card">
@@ -34,5 +27,7 @@
     </div>
     {% endfor %}
 </section>
-
+{% else %}
+<p class="catalog-empty-msg">{{ t('catalog.coming_soon') }}</p>
+{% endif %}
 {% endblock %}
