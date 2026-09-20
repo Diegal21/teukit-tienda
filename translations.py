@@ -9,6 +9,7 @@ TRANSLATIONS = {
     # --- Navegación y footer ---
     'nav.guide': {'pt': 'Guia', 'es': 'Guía', 'en': 'Guide'},
     'nav.catalog': {'pt': 'Catálogo', 'es': 'Catálogo', 'en': 'Catalog'},
+    'nav.contact': {'pt': 'Contacto', 'es': 'Contacto', 'en': 'Contact'},
     'nav.login': {'pt': 'Iniciar sessão', 'es': 'Iniciar sesión', 'en': 'Log in'},
     'nav.logout': {'pt': 'Sair', 'es': 'Salir', 'en': 'Log out'},
     'nav.cart': {'pt': 'Carrinho', 'es': 'Carrito', 'en': 'Cart'},
@@ -122,6 +123,23 @@ TRANSLATIONS = {
     'legal.placeholder_notice': {'pt': '⚠️ Este documento contém campos entre colchetes [ASSIM] que precisas de preencher com os dados reais do teu negócio antes de publicares a loja oficialmente.', 'es': '⚠️ Este documento contiene campos entre corchetes [ASÍ] que debes completar con los datos reales de tu negocio antes de publicar la tienda oficialmente.', 'en': '⚠️ This document contains bracketed fields [LIKE THIS] that you need to fill in with your real business details before officially publishing the store.'},
     'legal.privacy_title': {'pt': 'Política de Privacidade', 'es': 'Política de Privacidad', 'en': 'Privacy Policy'},
     'legal.terms_title': {'pt': 'Termos e Condições de Venda', 'es': 'Términos y Condiciones de Venta', 'en': 'Terms & Conditions of Sale'},
+
+    # --- Contacto ---
+    'contact.page_title': {'pt': 'Contacta-nos', 'es': 'Contáctanos', 'en': 'Contact us'},
+    'contact.page_subtitle': {'pt': 'Estamos aqui para ajudar. Escolhe a forma que preferires.', 'es': 'Estamos aquí para ayudar. Elige la forma que prefieras.', 'en': 'We’re here to help. Choose whichever way suits you.'},
+    'contact.whatsapp': {'pt': 'WhatsApp', 'es': 'WhatsApp', 'en': 'WhatsApp'},
+    'contact.whatsapp_desc': {'pt': 'Resposta rápida em horário comercial.', 'es': 'Respuesta rápida en horario comercial.', 'en': 'Quick reply during business hours.'},
+    'contact.instagram': {'pt': 'Instagram', 'es': 'Instagram', 'en': 'Instagram'},
+    'contact.instagram_desc': {'pt': 'Segue-nos para novidades e dicas.', 'es': 'Síguenos para novedades y consejos.', 'en': 'Follow us for updates and tips.'},
+    'contact.email': {'pt': 'Email', 'es': 'Email', 'en': 'Email'},
+    'contact.email_desc': {'pt': 'Para consultas mais detalhadas.', 'es': 'Para consultas más detalladas.', 'en': 'For more detailed inquiries.'},
+    'contact.form_title': {'pt': 'Ou envia-nos uma mensagem', 'es': 'O envíanos un mensaje', 'en': 'Or send us a message'},
+    'contact.form_name': {'pt': 'O teu nome', 'es': 'Tu nombre', 'en': 'Your name'},
+    'contact.form_email': {'pt': 'O teu email', 'es': 'Tu email', 'en': 'Your email'},
+    'contact.form_message': {'pt': 'A tua mensagem', 'es': 'Tu mensaje', 'en': 'Your message'},
+    'contact.form_submit': {'pt': 'Enviar mensagem', 'es': 'Enviar mensaje', 'en': 'Send message'},
+    'contact.success': {'pt': 'Mensagem enviada! Vamos responder-te em breve.', 'es': '¡Mensaje enviado! Te responderemos pronto.', 'en': 'Message sent! We’ll reply soon.'},
+    'contact.error_fields': {'pt': 'Preenche todos os campos.', 'es': 'Completa todos los campos.', 'en': 'Please fill in all fields.'},
 }
 
 

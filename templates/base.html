@@ -33,6 +33,7 @@
             <nav class="header-links" id="headerLinks">
                 <a href="{{ url_for('catalog') }}" class="account-link">{{ t('nav.catalog') }}</a>
                 <a href="{{ url_for('guide') }}" class="account-link">{{ t('nav.guide') }}</a>
+                <a href="{{ url_for('contact') }}" class="account-link">{{ t('nav.contact') }}</a>
                 {% if current_user %}
                     <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>
                     <a href="{{ url_for('logout') }}" class="account-link">{{ t('nav.logout') }}</a>
@@ -84,10 +85,15 @@
         <div class="footer-links">
             <a href="{{ url_for('privacy_policy') }}">{{ t('footer.privacy') }}</a>
             <a href="{{ url_for('terms') }}">{{ t('footer.terms') }}</a>
+            <a href="{{ url_for('contact') }}">{{ t('nav.contact') }}</a>
         </div>
         <p>&copy; {{ 2026 }} TeuKit — {{ t('footer.tagline') }}</p>
     </div>
 </footer>
+
+<a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" class="whatsapp-bubble" aria-label="WhatsApp">
+    💬
+</a>
 
 </body>
 </html>

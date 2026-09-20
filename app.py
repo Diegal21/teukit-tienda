@@ -253,6 +253,19 @@ SENDER_NAME = os.environ.get('SENDER_NAME', 'TeuKit')
 ADMIN_NOTIFICATION_EMAIL = os.environ.get('ADMIN_NOTIFICATION_EMAIL')
 BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email'
 
+# ----------------------------
+# DATOS DE CONTACTO
+# ----------------------------
+WHATSAPP_NUMBER = '351911900229'  # sin '+' ni espacios, formato requerido por wa.me
+INSTAGRAM_URL = 'https://www.instagram.com/teu_kitpt?stkn=MTV4NTNqZm54NDZqeQ=='
+CONTACT_EMAIL = 'teukit.pt@gmail.com'
+
+app.jinja_env.globals.update(
+    whatsapp_number=WHATSAPP_NUMBER,
+    instagram_url=INSTAGRAM_URL,
+    contact_email=CONTACT_EMAIL,
+)
+
 
 def send_email(to_email, subject, html_body):
     """Envía un email a través de la API HTTP de Brevo. Si no hay API key
@@ -354,6 +367,20 @@ def send_status_update_email(order_id, name, email, new_status):
     send_email(email, info['subject'], html)
 
 
+def send_contact_message(name, email, message):
+    """Envía la consulta del formulario de contacto al email del negocio."""
+    html = f"""
+    <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: #0f2d4f;">📩 Nova mensagem de contacto</h2>
+        <p><strong>Nome:</strong> {name}</p>
+        <p><strong>Email:</strong> {email}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p style="white-space: pre-line; background: #f4f6f8; padding: 12px; border-radius: 8px;">{message}</p>
+    </div>
+    """
+    send_email(CONTACT_EMAIL, f"Nova mensagem de contacto — {name}", html)
+
+
 def admin_required(view_func):
     from functools import wraps
 
@@ -443,6 +470,29 @@ def terms():
     lang = get_lang()
     template = 'terms.html' if lang == 'pt' else f'terms_{lang}.html'
     return render_template(template)
+
+
+@app.route('/contacto', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        message = request.form.get('message', '').strip()
+
+        if not name or not email or not message:
+            flash(t('contact.error_fields'), 'error')
+            return render_template('contact.html')
+
+        threading.Thread(
+            target=send_contact_message,
+            args=(name, email, message),
+            daemon=True
+        ).start()
+
+        flash(t('contact.success'), 'success')
+        return redirect(url_for('contact'))
+
+    return render_template('contact.html')
 
 
 @app.route('/carrito/agregar/<int:product_id>', methods=['POST'])

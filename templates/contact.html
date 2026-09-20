@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ t('contact.page_title') }} — TeuKit{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>{{ t('contact.page_title') }}</h1>
+    <p>{{ t('contact.page_subtitle') }}</p>
+</section>
+
+<section class="contact-channels">
+    <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" class="contact-card contact-card-whatsapp">
+        <span class="contact-card-icon">💬</span>
+        <h3>{{ t('contact.whatsapp') }}</h3>
+        <p>{{ t('contact.whatsapp_desc') }}</p>
+    </a>
+    <a href="{{ instagram_url }}" target="_blank" rel="noopener" class="contact-card contact-card-instagram">
+        <span class="contact-card-icon">📷</span>
+        <h3>{{ t('contact.instagram') }}</h3>
+        <p>{{ t('contact.instagram_desc') }}</p>
+    </a>
+    <a href="mailto:{{ contact_email }}" class="contact-card contact-card-email">
+        <span class="contact-card-icon">✉️</span>
+        <h3>{{ t('contact.email') }}</h3>
+        <p>{{ contact_email }}</p>
+    </a>
+</section>
+
+<section class="contact-form-section">
+    <h2>{{ t('contact.form_title') }}</h2>
+    <form method="POST" class="contact-form">
+        <div class="field-row">
+            <label for="name">{{ t('contact.form_name') }}</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="field-row">
+            <label for="email">{{ t('contact.form_email') }}</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="field-row">
+            <label for="message">{{ t('contact.form_message') }}</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ t('contact.form_submit') }}</button>
+    </form>
+</section>
+{% endblock %}
