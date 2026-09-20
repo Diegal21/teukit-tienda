@@ -779,9 +779,12 @@ a { text-decoration: none; color: inherit; }
 }
 .contact-card-icon {
     font-size: 2.2rem;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 10px;
 }
+.contact-card-icon-whatsapp { color: #25D366; }
 .contact-card h3 {
     margin: 0 0 6px;
     font-size: 1.1rem;
