@@ -17,7 +17,7 @@
         </a>
         <div class="product-card-body">
             <h2>{{ product.name }}</h2>
-            <p class="price">{{ price_display(product.price_cents) }}</p>
+            {% include "_price_block.html" %}
             {% if product.stock > 0 %}
                 <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary">{{ t('home.view_product') }}</a>
             {% else %}

@@ -10,6 +10,9 @@ TRANSLATIONS = {
     'nav.guide': {'pt': 'Guia', 'es': 'Guía', 'en': 'Guide'},
     'nav.catalog': {'pt': 'Catálogo', 'es': 'Catálogo', 'en': 'Catalog'},
     'nav.contact': {'pt': 'Contacto', 'es': 'Contacto', 'en': 'Contact'},
+
+    # --- Promoções / descontos ---
+    'product.promo_badge': {'pt': 'Promoção', 'es': 'Promoción', 'en': 'Sale'},
     'nav.login': {'pt': 'Iniciar sessão', 'es': 'Iniciar sesión', 'en': 'Log in'},
     'nav.logout': {'pt': 'Sair', 'es': 'Salir', 'en': 'Log out'},
     'nav.cart': {'pt': 'Carrinho', 'es': 'Carrito', 'en': 'Cart'},

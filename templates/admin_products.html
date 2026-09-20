@@ -41,6 +41,11 @@
         </div>
 
         <div class="field-row">
+            <label for="discount_percent-{{ product.id }}">Desconto promocional (%)</label>
+            <input type="number" id="discount_percent-{{ product.id }}" name="discount_percent" min="0" max="90" value="{{ product.discount_percent or 0 }}">
+        </div>
+
+        <div class="field-row">
             <label for="category-{{ product.id }}">Categoria</label>
             <select id="category-{{ product.id }}" name="category" required>
                 <option value="kit_emergencia" {% if product.category == 'kit_emergencia' %}selected{% endif %}>Kit de Emergência</option>

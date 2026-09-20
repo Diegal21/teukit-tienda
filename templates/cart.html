@@ -22,7 +22,9 @@
             {% for item in items %}
             <tr>
                 <td>{{ item.product.name }}</td>
-                <td>{{ price_display(item.product.price_cents) }}</td>
+                <td>
+                    {% with product = item.product %}{% include "_price_block.html" %}{% endwith %}
+                </td>
                 <td>
                     <form action="{{ url_for('cart_update', product_id=item.product.id) }}" method="POST" class="qty-form">
                         <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}">

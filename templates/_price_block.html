@@ -1,0 +1,9 @@
+{% if has_discount(product) %}
+<p class="price price-promo{{ ' price-large' if large|default(false) else '' }}">
+    <span class="price-original">{{ price_display(product.price_cents) }}</span>
+    <span class="price-discounted">{{ price_display(effective_price_cents(product)) }}</span>
+    <span class="promo-badge">{{ t('product.promo_badge') }} -{{ product.discount_percent }}%</span>
+</p>
+{% else %}
+<p class="price{{ ' price-large' if large|default(false) else '' }}">{{ price_display(product.price_cents) }}</p>
+{% endif %}

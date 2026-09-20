@@ -70,13 +70,19 @@ def init_db():
             image TEXT NOT NULL,
             stock INTEGER DEFAULT 100,
             active INTEGER DEFAULT 1,
-            category TEXT DEFAULT 'kit_emergencia'
+            category TEXT DEFAULT 'kit_emergencia',
+            discount_percent INTEGER DEFAULT 0
         )
     ''')
     # Migración: si el producto ya existía sin columna 'category' (bases de
     # datos creadas antes de agregar el catálogo por categorías), la agrega.
     try:
         db.execute("ALTER TABLE product ADD COLUMN category TEXT DEFAULT 'kit_emergencia'")
+    except sqlite3.OperationalError:
+        pass  # la columna ya existe
+    # Migración: agrega la columna de descuento promocional si no existe.
+    try:
+        db.execute("ALTER TABLE product ADD COLUMN discount_percent INTEGER DEFAULT 0")
     except sqlite3.OperationalError:
         pass  # la columna ya existe
     db.execute('''
@@ -130,6 +136,17 @@ def price_display(cents):
     return f"{cents/100:.2f}".replace('.', ',') + " €"
 
 
+def has_discount(product):
+    return bool(product['discount_percent']) and product['discount_percent'] > 0
+
+
+def effective_price_cents(product):
+    """Precio final a cobrar: aplica el descuento promocional si existe."""
+    if has_discount(product):
+        return round(product['price_cents'] * (100 - product['discount_percent']) / 100)
+    return product['price_cents']
+
+
 def slugify(text):
     text = text.lower().strip()
     replacements = {
@@ -168,11 +185,13 @@ def get_cart_items():
         product = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
         if not product:
             continue
-        subtotal_cents = product['price_cents'] * qty
+        unit_price = effective_price_cents(product)
+        subtotal_cents = unit_price * qty
         total_cents += subtotal_cents
         items.append({
             'product': product,
             'quantity': qty,
+            'unit_price_cents': unit_price,
             'subtotal_display': price_display(subtotal_cents)
         })
     return items, total_cents
@@ -188,7 +207,7 @@ def image_url(product):
     return url_for('static', filename='img/' + image)
 
 
-app.jinja_env.globals.update(price_display=price_display, image_url=image_url)
+app.jinja_env.globals.update(price_display=price_display, image_url=image_url, has_discount=has_discount, effective_price_cents=effective_price_cents)
 
 # ----------------------------
 # CATEGORÍAS DEL CATÁLOGO
@@ -307,7 +326,7 @@ def send_email(to_email, subject, html_body):
 
 def send_order_emails(order_id, name, email, address, phone, items, total_cents):
     items_html = "".join(
-        f"<li>{item['quantity']}x {item['product']['name']} — {price_display(item['product']['price_cents'] * item['quantity'])}</li>"
+        f"<li>{item['quantity']}x {item['product']['name']} — {price_display(item['unit_price_cents'] * item['quantity'])}</li>"
         for item in items
     )
     total_str = price_display(total_cents)
@@ -674,7 +693,7 @@ def checkout():
                 INSERT INTO order_item (order_id, product_id, product_name, unit_price_cents, quantity)
                 VALUES (?, ?, ?, ?, ?)
             ''', (order_id, item['product']['id'], item['product']['name'],
-                  item['product']['price_cents'], item['quantity']))
+                  item['unit_price_cents'], item['quantity']))
 
         db.commit()
 
@@ -702,7 +721,7 @@ def order_confirmation(order_id):
     order = db.execute('SELECT * FROM "order" WHERE id = ?', (order_id,)).fetchone()
     if not order:
         return "Pedido no encontrado", 404
-    return render_template('order_confirmation.html', order=order)
+    return render_template('order_confirmation.html', order=order, total_display=price_display(order['total_cents']))
 
 
 # ----------------------------
@@ -882,6 +901,7 @@ def admin_new_product():
         description = request.form.get('description', '').strip()
         stock = request.form.get('stock', '').strip()
         category = request.form.get('category', '').strip()
+        discount_str = request.form.get('discount_percent', '').strip()
 
         if not name or not description or not stock.isdigit() or category not in CATEGORY_ORDER:
             flash('Preenche todos os campos corretamente.', 'error')
@@ -891,6 +911,14 @@ def admin_new_product():
             price_cents = round(float(price_str.replace(',', '.')) * 100)
         except ValueError:
             flash('El precio no es válido.', 'error')
+            return render_template('admin_product_form.html', mode='new')
+
+        try:
+            discount_percent = int(discount_str) if discount_str else 0
+            if discount_percent < 0 or discount_percent > 90:
+                raise ValueError
+        except ValueError:
+            flash('El descuento debe ser un número entre 0 y 90.', 'error')
             return render_template('admin_product_form.html', mode='new')
 
         db = get_db()
@@ -912,9 +940,9 @@ def admin_new_product():
             return render_template('admin_product_form.html', mode='new')
 
         db.execute('''
-            INSERT INTO product (name, slug, price_cents, description, image, stock, active, category)
-            VALUES (?, ?, ?, ?, ?, ?, 1, ?)
-        ''', (name, slug, price_cents, description, image_value, int(stock), category))
+            INSERT INTO product (name, slug, price_cents, description, image, stock, active, category, discount_percent)
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
+        ''', (name, slug, price_cents, description, image_value, int(stock), category, discount_percent))
         db.commit()
         flash(f'Produto "{name}" criado com sucesso.', 'success')
         return redirect(url_for('admin_products'))
@@ -931,6 +959,7 @@ def admin_update_product(product_id):
     price_str = request.form.get('price', '').strip()
     active = 1 if request.form.get('active') == 'on' else 0
     category = request.form.get('category', '').strip()
+    discount_str = request.form.get('discount_percent', '').strip()
 
     if not name or not stock.isdigit() or not description or category not in CATEGORY_ORDER:
         flash('Preenche todos os campos corretamente.', 'error')
@@ -943,6 +972,14 @@ def admin_update_product(product_id):
         return redirect(url_for('admin_products'))
 
     try:
+        discount_percent = int(discount_str) if discount_str else 0
+        if discount_percent < 0 or discount_percent > 90:
+            raise ValueError
+    except ValueError:
+        flash('El descuento debe ser un número entre 0 y 90.', 'error')
+        return redirect(url_for('admin_products'))
+
+    try:
         new_image = save_uploaded_image(request.files.get('image'))
     except ValueError as e:
         flash(str(e), 'error')
@@ -951,13 +988,13 @@ def admin_update_product(product_id):
     db = get_db()
     if new_image:
         db.execute(
-            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ?, category = ? WHERE id = ?',
-            (name, int(stock), description, price_cents, active, new_image, category, product_id)
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ?, category = ?, discount_percent = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, new_image, category, discount_percent, product_id)
         )
     else:
         db.execute(
-            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, category = ? WHERE id = ?',
-            (name, int(stock), description, price_cents, active, category, product_id)
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, category = ?, discount_percent = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, category, discount_percent, product_id)
         )
     db.commit()
     flash('Producto actualizado correctamente.', 'success')

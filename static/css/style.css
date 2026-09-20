@@ -440,6 +440,38 @@ a { text-decoration: none; color: inherit; }
     margin-bottom: 14px;
 }
 .price-large { font-size: 1.8rem; }
+
+/* PRECIO CON DESCUENTO PROMOCIONAL */
+.price-promo {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.price-original {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #8a97a5;
+    text-decoration: line-through;
+}
+.price-discounted {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--vermelho);
+}
+.price-large .price-discounted { font-size: 1.8rem; }
+.price-large .price-original { font-size: 1.15rem; }
+.promo-badge {
+    display: inline-block;
+    background: var(--vermelho);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
 .out-of-stock {
     display: inline-block;
     background: #f0f0f0;

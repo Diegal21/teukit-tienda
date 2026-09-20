@@ -8,7 +8,7 @@
     </div>
     <div class="product-detail-info">
         <h1>{{ product.name }}</h1>
-        <p class="price price-large">{{ price_display(product.price_cents) }}</p>
+        {% with large = true %}{% include "_price_block.html" %}{% endwith %}
         <p class="description">{{ product.description }}</p>
 
         <form action="{{ url_for('cart_add', product_id=product.id) }}" method="POST" class="add-to-cart-form">
