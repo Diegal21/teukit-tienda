@@ -2,12 +2,17 @@ import os
 import sqlite3
 import threading
 import re
+import io
 import uuid
 import requests
-from flask import Flask, render_template, redirect, url_for, session, request, flash, g, send_from_directory
+from flask import Flask, render_template, redirect, url_for, session, request, flash, g, send_from_directory, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from translations import translate
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.lib.colors import HexColor
+from reportlab.pdfgen import canvas
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # DB_PATH es configurable por variable de entorno para poder apuntar a un
@@ -381,6 +386,92 @@ def send_contact_message(name, email, message):
     send_email(CONTACT_EMAIL, f"Nova mensagem de contacto — {name}", html)
 
 
+# ----------------------------
+# GUÍA EN PDF (generada dinámicamente en el idioma activo)
+# ----------------------------
+
+EMOJI_PATTERN = re.compile(
+    "[\U0001F300-\U0001FAFF\U00002600-\U000027BF\U0001F1E6-\U0001F1FF]+",
+    flags=re.UNICODE
+)
+
+
+def strip_emoji(text):
+    return EMOJI_PATTERN.sub('', text).strip()
+
+
+def generate_guide_pdf(lang):
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    margin = 2.2 * cm
+    max_width = width - 2 * margin
+    y = height - margin
+
+    navy = HexColor('#0f2d4f')
+    text_color = HexColor('#333333')
+    red = HexColor('#d9432e')
+
+    def draw_wrapped(text, x, top_y, font='Helvetica', size=10, leading=14, color=text_color):
+        c.setFont(font, size)
+        c.setFillColor(color)
+        line = ''
+        cur_y = top_y
+        for word in text.split(' '):
+            test = (line + ' ' + word).strip()
+            if c.stringWidth(test, font, size) > max_width and line:
+                c.drawString(x, cur_y, line)
+                cur_y -= leading
+                line = word
+            else:
+                line = test
+        if line:
+            c.drawString(x, cur_y, line)
+            cur_y -= leading
+        return cur_y
+
+    def ensure_space(cur_y, needed=70):
+        if cur_y < margin + needed:
+            c.showPage()
+            return height - margin
+        return cur_y
+
+    # Encabezado
+    c.setFillColor(navy)
+    c.setFont('Helvetica-Bold', 22)
+    c.drawString(margin, y, "TeuKit")
+    y -= 30
+    y = draw_wrapped(strip_emoji(translate('guide.title', lang)), margin, y,
+                      font='Helvetica-Bold', size=15, leading=19, color=navy)
+    y -= 8
+    y = draw_wrapped(translate('guide.intro', lang), margin, y, leading=14)
+    y -= 14
+
+    for i in range(1, 9):
+        title = strip_emoji(translate(f'guide.item{i}_title', lang))
+        desc = translate(f'guide.item{i}_desc', lang)
+        y = ensure_space(y)
+        c.setFillColor(navy)
+        c.setFont('Helvetica-Bold', 11.5)
+        c.drawString(margin, y, title)
+        y -= 16
+        y = draw_wrapped(desc, margin, y, leading=13)
+        y -= 10
+
+    y = ensure_space(y)
+    c.setFillColor(red)
+    c.setFont('Helvetica-Bold', 12.5)
+    c.drawString(margin, y, strip_emoji(translate('guide.emergency_title', lang)))
+    y -= 18
+    emergency_body = re.sub('<[^<]+?>', '', translate('guide.emergency_body', lang))
+    draw_wrapped(emergency_body, margin, y, leading=14)
+
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+
 def admin_required(view_func):
     from functools import wraps
 
@@ -456,6 +547,14 @@ def product_detail(slug):
 @app.route('/guia')
 def guide():
     return render_template('guide.html')
+
+
+@app.route('/guia/pdf')
+def guide_pdf():
+    lang = get_lang()
+    buffer = generate_guide_pdf(lang)
+    filename = f'guia-kit-essencial-teukit-{lang}.pdf'
+    return send_file(buffer, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
 
 @app.route('/privacidade')
