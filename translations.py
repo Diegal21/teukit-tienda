@@ -9,6 +9,7 @@ TRANSLATIONS = {
     # --- Navegación y footer ---
     'nav.guide': {'pt': 'Guia', 'es': 'Guía', 'en': 'Guide'},
     'nav.catalog': {'pt': 'Catálogo', 'es': 'Catálogo', 'en': 'Catalog'},
+    'nav.business': {'pt': 'Empresas', 'es': 'Empresas', 'en': 'Business'},
     'nav.contact': {'pt': 'Contacto', 'es': 'Contacto', 'en': 'Contact'},
 
     # --- Promoções / descontos ---
@@ -39,6 +40,17 @@ TRANSLATIONS = {
     'category.kit_viajes.desc': {'pt': 'Leva a tua segurança contigo para onde fores.', 'es': 'Lleva tu seguridad contigo a donde vayas.', 'en': 'Take your safety with you wherever you go.'},
     'category.kit_automovil.name': {'pt': 'Kit para Automóvel', 'es': 'Kit para Automóvil', 'en': 'Car Kit'},
     'category.kit_automovil.desc': {'pt': 'Pronto para qualquer imprevisto na estrada.', 'es': 'Listo para cualquier imprevisto en la carretera.', 'en': 'Ready for any unexpected event on the road.'},
+
+    # --- Soluções para Empresas ---
+    'business.page_title': {'pt': 'Soluções para Empresas', 'es': 'Soluciones para Empresas', 'en': 'Business Solutions'},
+    'business.page_subtitle': {'pt': 'Kits e ferramentas pensadas para o teu negócio.', 'es': 'Kits y herramientas pensadas para tu negocio.', 'en': 'Kits and tools designed for your business.'},
+
+    'category.nfc_resenas.name': {'pt': 'Cartões NFC de Avaliações', 'es': 'Tarjetas NFC de Reseñas', 'en': 'NFC Review Cards'},
+    'category.nfc_resenas.desc': {'pt': 'Consegue mais avaliações no Google com um simples toque.', 'es': 'Consigue más reseñas en Google con un simple toque.', 'en': 'Get more Google reviews with a simple tap.'},
+    'category.menu_digital.name': {'pt': 'Menu Digital QR/NFC', 'es': 'Menú Digital QR/NFC', 'en': 'Digital Menu QR/NFC'},
+    'category.menu_digital.desc': {'pt': 'O teu menu sempre atualizado, sem custos de impressão.', 'es': 'Tu menú siempre actualizado, sin costos de impresión.', 'en': 'Your menu always up to date, no printing costs.'},
+    'category.kit_incendio_hospedagem.name': {'pt': 'Kit de Incêndio p/ Hospedagem', 'es': 'Kit de Incendio p/ Hospedaje', 'en': 'Fire Kit for Hospitality'},
+    'category.kit_incendio_hospedagem.desc': {'pt': 'Segurança essencial para hóspedes do teu Airbnb ou alojamento.', 'es': 'Seguridad esencial para huéspedes de tu Airbnb o alojamiento.', 'en': 'Essential safety for guests at your Airbnb or rental.'},
     'home.view_product': {'pt': 'Ver produto', 'es': 'Ver producto', 'en': 'View product'},
     'home.sold_out': {'pt': 'Esgotado', 'es': 'Agotado', 'en': 'Sold out'},
 

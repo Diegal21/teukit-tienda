@@ -28,10 +28,17 @@
         <div class="field-row">
             <label for="category">Categoria</label>
             <select id="category" name="category" required>
-                <option value="kit_emergencia">Kit de Emergência</option>
-                <option value="kit_incendios">Kit de Incêndios</option>
-                <option value="kit_viajes">Kit de Viagens</option>
-                <option value="kit_automovil">Kit para Automóvel</option>
+                <optgroup label="Kits para clientes">
+                    <option value="kit_emergencia">Kit de Emergência</option>
+                    <option value="kit_incendios">Kit de Incêndios</option>
+                    <option value="kit_viajes">Kit de Viagens</option>
+                    <option value="kit_automovil">Kit para Automóvel</option>
+                </optgroup>
+                <optgroup label="Soluções para Empresas">
+                    <option value="nfc_resenas">Cartões NFC de Avaliações</option>
+                    <option value="menu_digital">Menu Digital QR/NFC</option>
+                    <option value="kit_incendio_hospedagem">Kit de Incêndio p/ Hospedagem</option>
+                </optgroup>
             </select>
         </div>
 

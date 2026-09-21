@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ product.name }} — TeuKit{% endblock %}
+{% block body_class %}{{ 'theme-dark' if is_business else '' }}{% endblock %}
 
 {% block content %}
 <section class="product-detail">

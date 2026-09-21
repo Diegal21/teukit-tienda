@@ -48,10 +48,17 @@
         <div class="field-row">
             <label for="category-{{ product.id }}">Categoria</label>
             <select id="category-{{ product.id }}" name="category" required>
-                <option value="kit_emergencia" {% if product.category == 'kit_emergencia' %}selected{% endif %}>Kit de Emergência</option>
-                <option value="kit_incendios" {% if product.category == 'kit_incendios' %}selected{% endif %}>Kit de Incêndios</option>
-                <option value="kit_viajes" {% if product.category == 'kit_viajes' %}selected{% endif %}>Kit de Viagens</option>
-                <option value="kit_automovil" {% if product.category == 'kit_automovil' %}selected{% endif %}>Kit para Automóvel</option>
+                <optgroup label="Kits para clientes">
+                    <option value="kit_emergencia" {% if product.category == 'kit_emergencia' %}selected{% endif %}>Kit de Emergência</option>
+                    <option value="kit_incendios" {% if product.category == 'kit_incendios' %}selected{% endif %}>Kit de Incêndios</option>
+                    <option value="kit_viajes" {% if product.category == 'kit_viajes' %}selected{% endif %}>Kit de Viagens</option>
+                    <option value="kit_automovil" {% if product.category == 'kit_automovil' %}selected{% endif %}>Kit para Automóvel</option>
+                </optgroup>
+                <optgroup label="Soluções para Empresas">
+                    <option value="nfc_resenas" {% if product.category == 'nfc_resenas' %}selected{% endif %}>Cartões NFC de Avaliações</option>
+                    <option value="menu_digital" {% if product.category == 'menu_digital' %}selected{% endif %}>Menu Digital QR/NFC</option>
+                    <option value="kit_incendio_hospedagem" {% if product.category == 'kit_incendio_hospedagem' %}selected{% endif %}>Kit de Incêndio p/ Hospedagem</option>
+                </optgroup>
             </select>
         </div>
 

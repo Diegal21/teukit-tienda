@@ -862,3 +862,42 @@ a { text-decoration: none; color: inherit; }
         font-size: 1.5rem;
     }
 }
+
+/* TEMA OSCURO — sección "Soluções para Empresas" */
+body.theme-dark {
+    background: #0d0d0d;
+    color: #e8e8e8;
+}
+.theme-dark .hero h1 {
+    color: var(--amarelo);
+}
+.theme-dark .hero p {
+    color: #c2c9d1;
+}
+.theme-dark .category-carousel-section .section-title {
+    color: var(--amarelo);
+}
+.theme-dark .product-card {
+    background: #1a1a1a;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+}
+.theme-dark .product-card-body h2 {
+    color: var(--amarelo);
+}
+.theme-dark .product-detail-info h1 {
+    color: var(--amarelo);
+}
+.theme-dark .description {
+    color: #c2c9d1;
+}
+.theme-dark .catalog-empty-msg {
+    color: #a8b0b8;
+}
+.theme-dark .price-original {
+    color: #7a828a;
+}
+.theme-dark .add-to-cart-form input[type="number"] {
+    background: #1a1a1a;
+    color: #e8e8e8;
+    border: 1px solid #333;
+}

@@ -1,9 +1,9 @@
 <section class="category-carousel-section">
     {% if show_title|default(true) %}
-        <h2 class="section-title">{{ t('catalog.section_title') }}</h2>
+        <h2 class="section-title">{{ section_title|default(t('catalog.section_title')) }}</h2>
     {% endif %}
     <div class="category-carousel">
-        {% for cat_slug in category_order %}
+        {% for cat_slug in cats|default(category_order) %}
         <a href="{{ url_for('category_view', cat_slug=cat_slug) }}"
            class="category-card"
            style="background-image: url('{{ category_image_url(cat_slug) }}');">

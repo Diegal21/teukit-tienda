@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ t('business.page_title') }} — TeuKit{% endblock %}
+{% block body_class %}theme-dark{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>{{ t('business.page_title') }}</h1>
+    <p>{{ t('business.page_subtitle') }}</p>
+</section>
+
+{% with show_title = false, cats = business_category_order %}
+    {% include "_category_carousel.html" %}
+{% endwith %}
+{% endblock %}

@@ -214,11 +214,17 @@ app.jinja_env.globals.update(price_display=price_display, image_url=image_url, h
 # ----------------------------
 
 CATEGORY_ORDER = ['kit_emergencia', 'kit_incendios', 'kit_viajes', 'kit_automovil']
+BUSINESS_CATEGORY_ORDER = ['nfc_resenas', 'menu_digital', 'kit_incendio_hospedagem']
+ALL_CATEGORIES = CATEGORY_ORDER + BUSINESS_CATEGORY_ORDER
+
 CATEGORY_IMAGES = {
     'kit_emergencia': 'categoria-emergencia.jpg',
     'kit_incendios': 'categoria-incendios.jpg',
     'kit_viajes': 'categoria-viagens.jpg',
     'kit_automovil': 'categoria-automovel.jpg',
+    'nfc_resenas': 'categoria-nfc-resenas.jpg',
+    'menu_digital': 'categoria-menu-digital.jpg',
+    'kit_incendio_hospedagem': 'categoria-incendio-hospedagem.jpg',
 }
 
 
@@ -226,7 +232,16 @@ def category_image_url(cat_slug):
     return url_for('static', filename='img/' + CATEGORY_IMAGES.get(cat_slug, ''))
 
 
-app.jinja_env.globals.update(category_order=CATEGORY_ORDER, category_image_url=category_image_url)
+def is_business_category(cat_slug):
+    return cat_slug in BUSINESS_CATEGORY_ORDER
+
+
+app.jinja_env.globals.update(
+    category_order=CATEGORY_ORDER,
+    business_category_order=BUSINESS_CATEGORY_ORDER,
+    category_image_url=category_image_url,
+    is_business_category=is_business_category,
+)
 
 SUPPORTED_LANGUAGES = ['pt', 'es', 'en']
 LANGUAGE_LABELS = {'pt': 'PT', 'es': 'ES', 'en': 'EN'}
@@ -543,15 +558,23 @@ def catalog():
     return render_template('catalog.html')
 
 
+@app.route('/empresas')
+def business_catalog():
+    return render_template('business_catalog.html')
+
+
 @app.route('/categoria/<cat_slug>')
 def category_view(cat_slug):
-    if cat_slug not in CATEGORY_ORDER:
+    if cat_slug not in ALL_CATEGORIES:
         return redirect(url_for('catalog'))
     db = get_db()
     products = db.execute(
         'SELECT * FROM product WHERE category = ? AND active = 1', (cat_slug,)
     ).fetchall()
-    return render_template('category.html', products=products, cat_slug=cat_slug)
+    is_business = is_business_category(cat_slug)
+    return render_template(
+        'category.html', products=products, cat_slug=cat_slug, is_business=is_business
+    )
 
 
 @app.route('/producto/<slug>')
@@ -560,7 +583,8 @@ def product_detail(slug):
     product = db.execute('SELECT * FROM product WHERE slug = ? AND active = 1', (slug,)).fetchone()
     if not product:
         return "Producto no encontrado", 404
-    return render_template('product_detail.html', product=product)
+    is_business = is_business_category(product['category'])
+    return render_template('product_detail.html', product=product, is_business=is_business)
 
 
 @app.route('/guia')
@@ -903,7 +927,7 @@ def admin_new_product():
         category = request.form.get('category', '').strip()
         discount_str = request.form.get('discount_percent', '').strip()
 
-        if not name or not description or not stock.isdigit() or category not in CATEGORY_ORDER:
+        if not name or not description or not stock.isdigit() or category not in ALL_CATEGORIES:
             flash('Preenche todos os campos corretamente.', 'error')
             return render_template('admin_product_form.html', mode='new')
 
@@ -961,7 +985,7 @@ def admin_update_product(product_id):
     category = request.form.get('category', '').strip()
     discount_str = request.form.get('discount_percent', '').strip()
 
-    if not name or not stock.isdigit() or not description or category not in CATEGORY_ORDER:
+    if not name or not stock.isdigit() or not description or category not in ALL_CATEGORIES:
         flash('Preenche todos os campos corretamente.', 'error')
         return redirect(url_for('admin_products'))
 
