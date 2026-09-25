@@ -24,6 +24,10 @@ TRANSLATIONS = {
     # --- Home ---
     'home.hero_title': {'pt': 'Já tens o teu KIT de emergência?', 'es': '¿Ya tienes tu KIT de emergencia?', 'en': 'Do you have your emergency KIT yet?'},
     'home.hero_subtitle': {'pt': 'Tudo o que precisas para os primeiros minutos que importam.', 'es': 'Todo lo que necesitas para los primeros minutos que importan.', 'en': 'Everything you need for the first crucial minutes.'},
+    'home.group_business_title': {'pt': 'Empresas', 'es': 'Empresas', 'en': 'Business'},
+    'home.group_business_desc': {'pt': 'Soluções e kits pensados para o teu negócio.', 'es': 'Soluciones y kits pensados para tu negocio.', 'en': 'Solutions and kits designed for your business.'},
+    'home.group_family_title': {'pt': 'Família', 'es': 'Familia', 'en': 'Family'},
+    'home.group_family_desc': {'pt': 'Kits de segurança para ti e para quem mais amas.', 'es': 'Kits de seguridad para ti y para quienes más quieres.', 'en': 'Safety kits for you and your loved ones.'},
 
     # --- Catálogo por categorías ---
     'catalog.section_title': {'pt': 'Escolhe o teu kit', 'es': 'Elige tu kit', 'en': 'Choose your kit'},
@@ -51,6 +55,8 @@ TRANSLATIONS = {
     'category.menu_digital.desc': {'pt': 'O teu menu sempre atualizado, sem custos de impressão.', 'es': 'Tu menú siempre actualizado, sin costos de impresión.', 'en': 'Your menu always up to date, no printing costs.'},
     'category.kit_incendio_hospedagem.name': {'pt': 'Kit de Incêndio p/ Hospedagem', 'es': 'Kit de Incendio p/ Hospedaje', 'en': 'Fire Kit for Hospitality'},
     'category.kit_incendio_hospedagem.desc': {'pt': 'Segurança essencial para hóspedes do teu Airbnb ou alojamento.', 'es': 'Seguridad esencial para huéspedes de tu Airbnb o alojamiento.', 'en': 'Essential safety for guests at your Airbnb or rental.'},
+    'category.kit_boas_vindas_hospedagem.name': {'pt': 'Kit de Boas-Vindas para Alojamentos', 'es': 'Kit de Bienvenida para Alojamientos', 'en': 'Welcome Kit for Accommodations'},
+    'category.kit_boas_vindas_hospedagem.desc': {'pt': 'Um mimo especial para os teus hóspedes desde o primeiro minuto.', 'es': 'Un detalle especial para tus huéspedes desde el primer minuto.', 'en': 'A special touch for your guests from the very first minute.'},
     'home.view_product': {'pt': 'Ver produto', 'es': 'Ver producto', 'en': 'View product'},
     'home.sold_out': {'pt': 'Esgotado', 'es': 'Agotado', 'en': 'Sold out'},
 

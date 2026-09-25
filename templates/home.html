@@ -3,10 +3,21 @@
 
 {% block content %}
 
-<section class="hero-video-section">
-    <video class="hero-video" autoplay muted loop playsinline>
-        <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
-    </video>
+<section class="home-groups">
+    <a href="{{ url_for('business_catalog') }}" class="home-group-card home-group-business"
+       style="background-image: url('{{ url_for('static', filename='img/home-empresas.jpg') }}');">
+        <div class="home-group-overlay">
+            <h2>{{ t('home.group_business_title') }}</h2>
+            <p class="home-group-desc">{{ t('home.group_business_desc') }}</p>
+        </div>
+    </a>
+    <a href="{{ url_for('catalog') }}" class="home-group-card home-group-family"
+       style="background-image: url('{{ url_for('static', filename='img/home-familia.jpg') }}');">
+        <div class="home-group-overlay">
+            <h2>{{ t('home.group_family_title') }}</h2>
+            <p class="home-group-desc">{{ t('home.group_family_desc') }}</p>
+        </div>
+    </a>
 </section>
 
 <section class="hero">

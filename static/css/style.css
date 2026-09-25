@@ -305,19 +305,56 @@ a { text-decoration: none; color: inherit; }
 .flash-success { background: #e3f0d8; color: #3d5a24; }
 .flash-error { background: #fbe1dd; color: var(--vermelho); }
 
-/* HERO VIDEO */
-.hero-video-section {
-    display: flex;
-    justify-content: center;
+/* GRUPOS DEL HOME: EMPRESAS / FAMÍLIA */
+.home-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     padding: 30px 0 10px;
 }
-.hero-video {
-    width: 100%;
-    max-width: 900px;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
+.home-group-card {
+    position: relative;
+    display: block;
+    height: 420px;
     border-radius: 18px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-color: #1a1a1a;
     box-shadow: 0 8px 24px rgba(15,45,79,0.18);
+    text-decoration: none;
+}
+.home-group-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+    background: linear-gradient(to top, rgba(10,20,35,0.88) 0%, rgba(10,20,35,0.4) 55%, rgba(10,20,35,0.08) 100%);
+    transition: background 0.25s ease;
+}
+.home-group-overlay h2 {
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 0 0 8px;
+}
+.home-group-desc {
+    color: rgba(255,255,255,0.95);
+    font-size: 1rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.home-group-card:hover .home-group-overlay,
+.home-group-card:focus .home-group-overlay {
+    background: rgba(10,20,35,0.78);
+}
+.home-group-card:hover .home-group-desc,
+.home-group-card:focus .home-group-desc {
+    max-height: 80px;
+    opacity: 1;
 }
 
 /* HERO */
@@ -736,6 +773,9 @@ a { text-decoration: none; color: inherit; }
     .logo-text { font-size: 1.1rem; }
 
     .category-card { flex: 0 0 250px; height: 320px; }
+
+    .home-groups { grid-template-columns: 1fr; }
+    .home-group-card { height: 260px; }
 
     .menu-toggle { display: flex; }
 
