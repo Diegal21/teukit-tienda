@@ -2,6 +2,12 @@
 {% block title %}{{ t('catalog.page_title') }} — TeuKit{% endblock %}
 
 {% block content %}
+<section class="hero-video-section">
+    <video class="hero-video" autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
+    </video>
+</section>
+
 <section class="hero">
     <h1>{{ t('catalog.page_title') }}</h1>
     <p>{{ t('catalog.page_subtitle') }}</p>
