@@ -71,7 +71,8 @@ def init_db():
             stock INTEGER DEFAULT 100,
             active INTEGER DEFAULT 1,
             category TEXT DEFAULT 'kit_emergencia',
-            discount_percent INTEGER DEFAULT 0
+            discount_percent INTEGER DEFAULT 0,
+            is_addon INTEGER DEFAULT 0
         )
     ''')
     # Migración: si el producto ya existía sin columna 'category' (bases de
@@ -83,6 +84,11 @@ def init_db():
     # Migración: agrega la columna de descuento promocional si no existe.
     try:
         db.execute("ALTER TABLE product ADD COLUMN discount_percent INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass  # la columna ya existe
+    # Migración: agrega la columna de complemento (add-on) si no existe.
+    try:
+        db.execute("ALTER TABLE product ADD COLUMN is_addon INTEGER DEFAULT 0")
     except sqlite3.OperationalError:
         pass  # la columna ya existe
     db.execute('''
@@ -550,13 +556,54 @@ def inject_current_user():
 @app.route('/')
 def home():
     db = get_db()
-    products = db.execute('SELECT * FROM product WHERE active = 1').fetchall()
+    placeholders = ','.join('?' * len(CATEGORY_ORDER))
+    products = db.execute(
+        f'SELECT * FROM product WHERE category IN ({placeholders}) AND active = 1 AND is_addon = 0',
+        CATEGORY_ORDER
+    ).fetchall()
     return render_template('home.html', products=products)
+
+
+def get_bestseller_products(limit=8):
+    """Productos más pedidos del segmento familiar (según ventas reales).
+    Si todavía no hay pedidos registrados, muestra los productos familiares
+    activos más recientes como respaldo, para que el carrusel nunca quede vacío."""
+    db = get_db()
+    placeholders = ','.join('?' * len(CATEGORY_ORDER))
+    rows = db.execute(f'''
+        SELECT product.*, SUM(order_item.quantity) AS total_pedidos
+        FROM order_item
+        JOIN product ON product.id = order_item.product_id
+        WHERE product.category IN ({placeholders}) AND product.active = 1 AND product.is_addon = 0
+        GROUP BY product.id
+        ORDER BY total_pedidos DESC
+        LIMIT ?
+    ''', (*CATEGORY_ORDER, limit)).fetchall()
+
+    if rows:
+        return rows
+
+    return db.execute(f'''
+        SELECT * FROM product
+        WHERE category IN ({placeholders}) AND active = 1 AND is_addon = 0
+        ORDER BY id DESC
+        LIMIT ?
+    ''', (*CATEGORY_ORDER, limit)).fetchall()
+
+
+def get_addon_products():
+    """Productos "complemento": no se venden solos, solo se ofrecen como
+    sugerencia para sumar a un kit familiar ya existente."""
+    db = get_db()
+    return db.execute(
+        'SELECT * FROM product WHERE is_addon = 1 AND active = 1 ORDER BY price_cents ASC'
+    ).fetchall()
 
 
 @app.route('/catalogo')
 def catalog():
-    return render_template('catalog.html')
+    bestsellers = get_bestseller_products()
+    return render_template('catalog.html', bestsellers=bestsellers)
 
 
 @app.route('/empresas')
@@ -570,7 +617,7 @@ def category_view(cat_slug):
         return redirect(url_for('catalog'))
     db = get_db()
     products = db.execute(
-        'SELECT * FROM product WHERE category = ? AND active = 1', (cat_slug,)
+        'SELECT * FROM product WHERE category = ? AND active = 1 AND is_addon = 0', (cat_slug,)
     ).fetchall()
     is_business = is_business_category(cat_slug)
     return render_template(
@@ -585,7 +632,10 @@ def product_detail(slug):
     if not product:
         return "Producto no encontrado", 404
     is_business = is_business_category(product['category'])
-    return render_template('product_detail.html', product=product, is_business=is_business)
+    addons = []
+    if not is_business and not product['is_addon']:
+        addons = get_addon_products()
+    return render_template('product_detail.html', product=product, is_business=is_business, addons=addons)
 
 
 @app.route('/guia')
@@ -655,8 +705,30 @@ def cart_add(product_id):
         new_qty = product['stock']
         flash(f'Apenas {product["stock"]} unidades disponíveis de "{product["name"]}".', 'error')
     cart[key] = new_qty
+
+    # Complementos seleccionados junto con el kit (checkboxes del formulario
+    # de producto). Cada uno se suma en cantidad 1, respetando su stock.
+    addon_names = []
+    for addon_id_str in request.form.getlist('addon_ids'):
+        try:
+            addon_id = int(addon_id_str)
+        except ValueError:
+            continue
+        addon = db.execute(
+            'SELECT * FROM product WHERE id = ? AND is_addon = 1 AND active = 1', (addon_id,)
+        ).fetchone()
+        if not addon or addon['stock'] <= 0:
+            continue
+        addon_key = str(addon_id)
+        addon_new_qty = min(cart.get(addon_key, 0) + 1, addon['stock'])
+        cart[addon_key] = addon_new_qty
+        addon_names.append(addon['name'])
+
     save_cart(cart)
-    flash(f'"{product["name"]}" añadido al carrito.', 'success')
+    if addon_names:
+        flash(f'"{product["name"]}" añadido al carrito, junto con: {", ".join(addon_names)}.', 'success')
+    else:
+        flash(f'"{product["name"]}" añadido al carrito.', 'success')
     return redirect(request.referrer or url_for('home'))
 
 
@@ -683,7 +755,12 @@ def cart_update(product_id):
 @app.route('/carrito')
 def cart_view():
     items, total_cents = get_cart_items()
-    return render_template('cart.html', items=items, total_display=price_display(total_cents), is_empty=(len(items) == 0))
+    cart_product_ids = {item['product']['id'] for item in items}
+    addons = [a for a in get_addon_products() if a['id'] not in cart_product_ids]
+    return render_template(
+        'cart.html', items=items, total_display=price_display(total_cents),
+        is_empty=(len(items) == 0), addons=addons
+    )
 
 
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -927,6 +1004,7 @@ def admin_new_product():
         stock = request.form.get('stock', '').strip()
         category = request.form.get('category', '').strip()
         discount_str = request.form.get('discount_percent', '').strip()
+        is_addon = 1 if request.form.get('is_addon') == 'on' else 0
 
         if not name or not description or not stock.isdigit() or category not in ALL_CATEGORIES:
             flash('Preenche todos os campos corretamente.', 'error')
@@ -965,9 +1043,9 @@ def admin_new_product():
             return render_template('admin_product_form.html', mode='new')
 
         db.execute('''
-            INSERT INTO product (name, slug, price_cents, description, image, stock, active, category, discount_percent)
-            VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
-        ''', (name, slug, price_cents, description, image_value, int(stock), category, discount_percent))
+            INSERT INTO product (name, slug, price_cents, description, image, stock, active, category, discount_percent, is_addon)
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
+        ''', (name, slug, price_cents, description, image_value, int(stock), category, discount_percent, is_addon))
         db.commit()
         flash(f'Produto "{name}" criado com sucesso.', 'success')
         return redirect(url_for('admin_products'))
@@ -985,6 +1063,7 @@ def admin_update_product(product_id):
     active = 1 if request.form.get('active') == 'on' else 0
     category = request.form.get('category', '').strip()
     discount_str = request.form.get('discount_percent', '').strip()
+    is_addon = 1 if request.form.get('is_addon') == 'on' else 0
 
     if not name or not stock.isdigit() or not description or category not in ALL_CATEGORIES:
         flash('Preenche todos os campos corretamente.', 'error')
@@ -1013,13 +1092,13 @@ def admin_update_product(product_id):
     db = get_db()
     if new_image:
         db.execute(
-            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ?, category = ?, discount_percent = ? WHERE id = ?',
-            (name, int(stock), description, price_cents, active, new_image, category, discount_percent, product_id)
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, image = ?, category = ?, discount_percent = ?, is_addon = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, new_image, category, discount_percent, is_addon, product_id)
         )
     else:
         db.execute(
-            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, category = ?, discount_percent = ? WHERE id = ?',
-            (name, int(stock), description, price_cents, active, category, discount_percent, product_id)
+            'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, category = ?, discount_percent = ?, is_addon = ? WHERE id = ?',
+            (name, int(stock), description, price_cents, active, category, discount_percent, is_addon, product_id)
         )
     db.commit()
     flash('Producto actualizado correctamente.', 'success')

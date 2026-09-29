@@ -1,0 +1,21 @@
+<section class="bestsellers-section">
+    <h2 class="section-title">{{ t('catalog.bestsellers_title') }}</h2>
+    <div class="bestsellers-carousel">
+        {% for product in bestsellers %}
+        <div class="product-card bestseller-card">
+            <a href="{{ url_for('product_detail', slug=product.slug) }}">
+                <img src="{{ image_url(product) }}" alt="{{ product.name }}" class="product-img">
+            </a>
+            <div class="product-card-body">
+                <h2>{{ product.name }}</h2>
+                {% include "_price_block.html" %}
+                {% if product.stock > 0 %}
+                    <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary">{{ t('home.view_product') }}</a>
+                {% else %}
+                    <span class="out-of-stock">{{ t('home.sold_out') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>

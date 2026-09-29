@@ -34,6 +34,22 @@
                 <td>{{ item.subtotal_display }}</td>
                 <td><a href="{{ url_for('cart_remove', product_id=item.product.id) }}" class="remove-link">{{ t('cart.remove') }}</a></td>
             </tr>
+            {% if addons and item.product.category in category_order and not item.product.is_addon %}
+            <tr class="addons-suggestion-row">
+                <td colspan="5">
+                    <div class="addons-suggestion">
+                        <span class="addons-suggestion-label">{{ t('cart.addons_suggestion') }}</span>
+                        {% for addon in addons %}
+                        <form action="{{ url_for('cart_add', product_id=addon.id) }}" method="POST" class="addon-suggestion-chip">
+                            <img src="{{ image_url(addon) }}" alt="{{ addon.name }}">
+                            <span>{{ addon.name }} · {{ price_display(effective_price_cents(addon)) }}</span>
+                            <button type="submit" class="btn btn-small">{{ t('cart.add_addon') }}</button>
+                        </form>
+                        {% endfor %}
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>

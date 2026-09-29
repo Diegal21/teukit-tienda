@@ -2,11 +2,20 @@
 {% block title %}{{ t('catalog.page_title') }} — TeuKit{% endblock %}
 
 {% block content %}
+{#
+    Video "dormido" a pedido — se reemplazó por el carrusel de más pedidos.
+    Para reactivarlo, descomenta este bloque (y opcionalmente quita/mueve el carrusel).
+
 <section class="hero-video-section">
     <video class="hero-video" autoplay muted loop playsinline>
         <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
     </video>
 </section>
+#}
+
+{% if bestsellers %}
+    {% include "_bestsellers_carousel.html" %}
+{% endif %}
 
 <section class="hero">
     <h1>{{ t('catalog.page_title') }}</h1>

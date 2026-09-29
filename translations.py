@@ -28,11 +28,13 @@ TRANSLATIONS = {
     'home.group_business_desc': {'pt': 'Soluções e kits pensados para o teu negócio.', 'es': 'Soluciones y kits pensados para tu negocio.', 'en': 'Solutions and kits designed for your business.'},
     'home.group_family_title': {'pt': 'Família', 'es': 'Familia', 'en': 'Family'},
     'home.group_family_desc': {'pt': 'Kits de segurança para ti e para quem mais amas.', 'es': 'Kits de seguridad para ti y para quienes más quieres.', 'en': 'Safety kits for you and your loved ones.'},
+    'home.addons_teaser': {'pt': 'Sabias que podes completar qualquer kit com complementos extra? Escolhe o teu kit e descobre.', 'es': '¿Sabías que podés completar cualquier kit con complementos extra? Elegí tu kit y descubrilo.', 'en': 'Did you know you can complete any kit with extra add-ons? Pick your kit to find out.'},
 
     # --- Catálogo por categorías ---
     'catalog.section_title': {'pt': 'Escolhe o teu kit', 'es': 'Elige tu kit', 'en': 'Choose your kit'},
     'catalog.page_title': {'pt': 'Catálogo TeuKit', 'es': 'Catálogo TeuKit', 'en': 'TeuKit Catalog'},
     'catalog.page_subtitle': {'pt': 'Um kit para cada situação. Explora as categorias.', 'es': 'Un kit para cada situación. Explora las categorías.', 'en': 'A kit for every situation. Explore the categories.'},
+    'catalog.bestsellers_title': {'pt': 'Os mais pedidos', 'es': 'Los más pedidos', 'en': 'Best sellers'},
     'catalog.coming_soon': {'pt': 'Novos produtos desta categoria brevemente disponíveis.', 'es': 'Nuevos productos de esta categoría próximamente disponibles.', 'en': 'New products in this category coming soon.'},
     'catalog.back_to_catalog': {'pt': 'Voltar ao catálogo', 'es': 'Volver al catálogo', 'en': 'Back to catalog'},
 
@@ -63,6 +65,8 @@ TRANSLATIONS = {
     # --- Producto ---
     'product.quantity': {'pt': 'Quantidade', 'es': 'Cantidad', 'en': 'Quantity'},
     'product.add_to_cart': {'pt': 'Adicionar ao carrinho', 'es': 'Añadir al carrito', 'en': 'Add to cart'},
+    'product.addons_title': {'pt': 'Queres completar o teu kit?', 'es': '¿Querés completar tu kit?', 'en': 'Want to complete your kit?'},
+    'product.addons_hint': {'pt': 'Adiciona estes complementos junto com o teu kit.', 'es': 'Agregá estos complementos junto con tu kit.', 'en': 'Add these extras along with your kit.'},
     'product.sold_out': {'pt': 'Esgotado', 'es': 'Agotado', 'en': 'Sold out'},
 
     # --- Carrito ---
@@ -76,6 +80,8 @@ TRANSLATIONS = {
     'cart.update': {'pt': 'Atualizar', 'es': 'Actualizar', 'en': 'Update'},
     'cart.remove': {'pt': 'Remover', 'es': 'Eliminar', 'en': 'Remove'},
     'cart.total': {'pt': 'Total', 'es': 'Total', 'en': 'Total'},
+    'cart.addons_suggestion': {'pt': '💡 Completa o teu kit:', 'es': '💡 Completá tu kit:', 'en': '💡 Complete your kit:'},
+    'cart.add_addon': {'pt': 'Adicionar', 'es': 'Agregar', 'en': 'Add'},
     'cart.checkout': {'pt': 'Finalizar compra', 'es': 'Finalizar compra', 'en': 'Checkout'},
 
     # --- Checkout ---
