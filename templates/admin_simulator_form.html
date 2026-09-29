@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if mode == 'edit' else 'Nova' }} simulação — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>{{ 'Editar simulação' if mode == 'edit' else 'Nova simulação de Kit' }}</h1>
+    <div>
+        <a href="{{ url_for('admin_simulator_list') }}" class="btn btn-small">← Voltar</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-small">Sair</a>
+    </div>
+</div>
+
+<form action="{{ url_for('admin_simulator_save', sim_id=simulation.id) if mode == 'edit' else url_for('admin_simulator_save') }}"
+      method="POST" id="sim-form">
+
+    <div class="field-row">
+        <label for="name">Nome do kit</label>
+        <input type="text" id="name" name="name" value="{{ simulation.name if simulation else '' }}" placeholder="ex: Kit Premium Automóvel" required>
+    </div>
+
+    <div class="field-row">
+        <label for="margin_percent">Margem de lucro (%)</label>
+        <input type="number" id="margin_percent" step="0.1" min="0" value="{{ simulation.margin_percent if simulation else 30 }}">
+    </div>
+
+    <table class="sim-table">
+        <thead>
+            <tr>
+                <th>Elemento</th>
+                <th>Qtd.</th>
+                <th>Fornecedor</th>
+                <th>Custo unit. (€)</th>
+                <th>Custo × Qtd.</th>
+                <th>Custo c/ IVA (23%)</th>
+                <th>Margem</th>
+                <th>Preço sugerido</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="items-tbody">
+            {% for item in items %}
+            <tr class="sim-item-row">
+                <td><input type="text" name="item_name" value="{{ item.name }}" placeholder="Nome do elemento" required></td>
+                <td><input type="number" name="item_quantity" step="0.01" min="0" value="{{ item.quantity }}" class="qty-input"></td>
+                <td><input type="text" name="item_supplier" value="{{ item.supplier or '' }}" placeholder="Opcional"></td>
+                <td><input type="number" name="item_unit_cost" step="0.01" min="0" value="{{ '%.2f'|format(item.unit_cost_cents/100) }}" class="cost-input"></td>
+                <td class="computed cost-total">—</td>
+                <td class="computed cost-iva">—</td>
+                <td class="computed margin-amount">—</td>
+                <td class="computed suggested-price">—</td>
+                <td><button type="button" class="btn btn-small remove-row-btn">✕</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="sim-totals-row">
+                <td colspan="4">TOTAL</td>
+                <td id="total-cost">—</td>
+                <td id="total-cost-iva">—</td>
+                <td id="total-margin">—</td>
+                <td id="total-suggested">—</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button type="button" id="add-row-btn" class="btn btn-small">+ Adicionar elemento</button>
+
+    <div class="sim-final-price">
+        <div class="field-row">
+            <label for="final_price">Preço de venda final (€)</label>
+            <input type="number" id="final_price" name="final_price" step="0.01" min="0"
+                   value="{{ '%.2f'|format(simulation.final_price_cents/100) if simulation and simulation.final_price_cents else '' }}"
+                   placeholder="ex: 39.90">
+        </div>
+        <button type="button" id="use-suggested-btn" class="btn btn-small">Usar preço sugerido</button>
+    </div>
+
+    <div class="admin-header" style="margin-top: 24px;">
+        <button type="submit" class="btn btn-primary">Guardar simulação</button>
+    </div>
+</form>
+
+{% if mode == 'edit' %}
+<form action="{{ url_for('admin_simulator_delete', sim_id=simulation.id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta simulação?');" style="margin-top: 10px;">
+    <button type="submit" class="btn remove-link">Eliminar simulação</button>
+</form>
+{% endif %}
+
+<script>
+(function () {
+    const IVA_RATE = 0.23;
+    const tbody = document.getElementById('items-tbody');
+    const marginInput = document.getElementById('margin_percent');
+    const finalPriceInput = document.getElementById('final_price');
+
+    function formatEuro(n) {
+        if (isNaN(n)) n = 0;
+        return n.toFixed(2).replace('.', ',') + ' €';
+    }
+
+    function rowTemplate() {
+        const tr = document.createElement('tr');
+        tr.className = 'sim-item-row';
+        tr.innerHTML = `
+            <td><input type="text" name="item_name" placeholder="Nome do elemento" required></td>
+            <td><input type="number" name="item_quantity" step="0.01" min="0" value="1" class="qty-input"></td>
+            <td><input type="text" name="item_supplier" placeholder="Opcional"></td>
+            <td><input type="number" name="item_unit_cost" step="0.01" min="0" value="0.00" class="cost-input"></td>
+            <td class="computed cost-total">—</td>
+            <td class="computed cost-iva">—</td>
+            <td class="computed margin-amount">—</td>
+            <td class="computed suggested-price">—</td>
+            <td><button type="button" class="btn btn-small remove-row-btn">✕</button></td>
+        `;
+        return tr;
+    }
+
+    function recalcAll() {
+        const marginPercent = parseFloat(marginInput.value) || 0;
+        let totals = { cost: 0, costIva: 0, margin: 0, suggested: 0 };
+
+        tbody.querySelectorAll('.sim-item-row').forEach(function (row) {
+            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+            const unitCost = parseFloat(row.querySelector('.cost-input').value) || 0;
+
+            const cost = qty * unitCost;
+            const costIva = cost * (1 + IVA_RATE);
+            const marginAmount = costIva * (marginPercent / 100);
+            const suggested = costIva + marginAmount;
+
+            row.querySelector('.cost-total').textContent = formatEuro(cost);
+            row.querySelector('.cost-iva').textContent = formatEuro(costIva);
+            row.querySelector('.margin-amount').textContent = formatEuro(marginAmount);
+            row.querySelector('.suggested-price').textContent = formatEuro(suggested);
+
+            totals.cost += cost;
+            totals.costIva += costIva;
+            totals.margin += marginAmount;
+            totals.suggested += suggested;
+        });
+
+        document.getElementById('total-cost').textContent = formatEuro(totals.cost);
+        document.getElementById('total-cost-iva').textContent = formatEuro(totals.costIva);
+        document.getElementById('total-margin').textContent = formatEuro(totals.margin);
+        document.getElementById('total-suggested').textContent = formatEuro(totals.suggested);
+
+        window._teukitSuggestedTotal = totals.suggested;
+    }
+
+    document.getElementById('add-row-btn').addEventListener('click', function () {
+        tbody.appendChild(rowTemplate());
+        recalcAll();
+    });
+
+    tbody.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-row-btn')) {
+            e.target.closest('tr').remove();
+            recalcAll();
+        }
+    });
+
+    tbody.addEventListener('input', recalcAll);
+    marginInput.addEventListener('input', recalcAll);
+
+    document.getElementById('use-suggested-btn').addEventListener('click', function () {
+        recalcAll();
+        finalPriceInput.value = (window._teukitSuggestedTotal || 0).toFixed(2);
+    });
+
+    // Si no hay ninguna fila al cargar (simulación nueva), arranca con una vacía.
+    if (tbody.querySelectorAll('.sim-item-row').length === 0) {
+        tbody.appendChild(rowTemplate());
+    }
+
+    recalcAll();
+})();
+</script>
+{% endblock %}

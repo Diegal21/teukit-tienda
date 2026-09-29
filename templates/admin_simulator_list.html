@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Simulador de Kits — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Simulador de Kits</h1>
+    <div>
+        <a href="{{ url_for('admin_simulator_new') }}" class="btn btn-primary btn-small">+ Nova simulação</a>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-small">Ver produtos</a>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-small">Ver pedidos</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-small">Sair</a>
+    </div>
+</div>
+
+<p class="admin-hint">
+    Simula a composição e o custo de um kit antes de o publicar como produto: soma os
+    elementos, o IVA (23%) e a margem aplicam-se automaticamente.
+</p>
+
+{% if results|length == 0 %}
+    <p>Ainda não criaste nenhuma simulação.</p>
+{% else %}
+    {% for r in results %}
+    <div class="order-card">
+        <div class="order-card-header">
+            <div>
+                <strong>{{ r.sim.name }}</strong>
+                <span class="order-date">{{ r.item_count }} elemento{{ 's' if r.item_count != 1 }} · margem {{ r.sim.margin_percent|round(1) }}%</span>
+            </div>
+        </div>
+        <div class="order-card-body">
+            <p><strong>Custo total (s/IVA):</strong> {{ price_display(r.cost_cents) }}</p>
+            <p><strong>Preço final definido:</strong> {{ price_display(r.sim.final_price_cents) if r.sim.final_price_cents else '—' }}</p>
+        </div>
+        <div class="order-card-footer">
+            <a href="{{ url_for('admin_simulator_edit', sim_id=r.sim.id) }}" class="btn btn-small">Abrir / Editar</a>
+            <form action="{{ url_for('admin_simulator_delete', sim_id=r.sim.id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta simulação?');" style="display:inline;">
+                <button type="submit" class="btn btn-small remove-link">Eliminar</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

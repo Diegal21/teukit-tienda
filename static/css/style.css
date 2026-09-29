@@ -823,6 +823,19 @@ a { text-decoration: none; color: inherit; }
 .status-pagado { background: #d8ecf5; color: #0f5a7a; }
 .status-enviado { background: #e3f0d8; color: #3d5a24; }
 .order-card-body p { margin-bottom: 6px; }
+.order-card-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+.admin-hint {
+    color: #667788;
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+    max-width: 700px;
+}
 .order-total { margin-top: 10px; color: var(--azul-marino); font-size: 1.1rem; }
 .status-form {
     display: flex;
@@ -1079,3 +1092,55 @@ body.theme-dark {
     max-width: 620px;
     margin: 6px auto 24px;
 }
+
+/* SIMULADOR DE KITS (admin) */
+.sim-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--branco);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.88rem;
+}
+.sim-table th, .sim-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+.sim-table th {
+    background: var(--azul-marino);
+    color: var(--branco);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+}
+.sim-table input[type="text"], .sim-table input[type="number"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #dde3e8;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+.sim-table td.computed {
+    color: #556677;
+    white-space: nowrap;
+    font-weight: 600;
+}
+.sim-table .suggested-price {
+    color: var(--vermelho);
+    font-weight: 700;
+}
+.sim-totals-row td {
+    background: #f6f4ef;
+    font-weight: 800;
+    color: var(--azul-marino);
+    border-top: 2px solid var(--azul-marino);
+}
+.sim-final-price {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    margin-top: 20px;
+    max-width: 420px;
+}
+.sim-final-price .field-row { flex: 1; margin-bottom: 0; }

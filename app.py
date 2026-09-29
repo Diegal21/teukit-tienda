@@ -115,6 +115,31 @@ def init_db():
         )
     ''')
 
+    # ----------------------------
+    # SIMULADOR DE KITS (calculadora de costos, solo para admin)
+    # ----------------------------
+    db.execute('''
+        CREATE TABLE IF NOT EXISTS kit_simulation (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            margin_percent REAL DEFAULT 30,
+            final_price_cents INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    db.execute('''
+        CREATE TABLE IF NOT EXISTS kit_simulation_item (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            simulation_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            quantity REAL DEFAULT 1,
+            unit_cost_cents INTEGER DEFAULT 0,
+            supplier TEXT,
+            sort_order INTEGER DEFAULT 0
+        )
+    ''')
+
     existing = db.execute('SELECT COUNT(*) FROM product').fetchone()[0]
     if existing == 0:
         db.execute('''
@@ -975,6 +1000,111 @@ def admin_products():
     db = get_db()
     products = db.execute('SELECT * FROM product ORDER BY id').fetchall()
     return render_template('admin_products.html', products=products)
+
+
+IVA_RATE = 0.23  # 23% — IVA de Portugal
+
+
+@app.route('/admin/simulador')
+@admin_required
+def admin_simulator_list():
+    db = get_db()
+    simulations = db.execute('SELECT * FROM kit_simulation ORDER BY updated_at DESC').fetchall()
+    results = []
+    for sim in simulations:
+        items = db.execute(
+            'SELECT * FROM kit_simulation_item WHERE simulation_id = ?', (sim['id'],)
+        ).fetchall()
+        cost_cents = sum(round(item['unit_cost_cents'] * item['quantity']) for item in items)
+        results.append({'sim': sim, 'item_count': len(items), 'cost_cents': cost_cents})
+    return render_template('admin_simulator_list.html', results=results)
+
+
+@app.route('/admin/simulador/novo')
+@admin_required
+def admin_simulator_new():
+    return render_template('admin_simulator_form.html', mode='new', simulation=None, items=[])
+
+
+@app.route('/admin/simulador/<int:sim_id>/editar')
+@admin_required
+def admin_simulator_edit(sim_id):
+    db = get_db()
+    simulation = db.execute('SELECT * FROM kit_simulation WHERE id = ?', (sim_id,)).fetchone()
+    if not simulation:
+        flash('Simulação no encontrada.', 'error')
+        return redirect(url_for('admin_simulator_list'))
+    items = db.execute(
+        'SELECT * FROM kit_simulation_item WHERE simulation_id = ? ORDER BY sort_order, id', (sim_id,)
+    ).fetchall()
+    return render_template('admin_simulator_form.html', mode='edit', simulation=simulation, items=items)
+
+
+@app.route('/admin/simulador/guardar', methods=['POST'])
+@app.route('/admin/simulador/<int:sim_id>/guardar', methods=['POST'])
+@admin_required
+def admin_simulator_save(sim_id=None):
+    name = request.form.get('name', '').strip() or 'Kit sem nome'
+    try:
+        margin_percent = float(request.form.get('margin_percent', '30').replace(',', '.'))
+    except ValueError:
+        margin_percent = 30.0
+    try:
+        final_price_cents = round(float(request.form.get('final_price', '0').replace(',', '.')) * 100)
+    except ValueError:
+        final_price_cents = 0
+
+    item_names = request.form.getlist('item_name')
+    item_qtys = request.form.getlist('item_quantity')
+    item_costs = request.form.getlist('item_unit_cost')
+    item_suppliers = request.form.getlist('item_supplier')
+
+    db = get_db()
+    if sim_id:
+        db.execute(
+            'UPDATE kit_simulation SET name = ?, margin_percent = ?, final_price_cents = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+            (name, margin_percent, final_price_cents, sim_id)
+        )
+        db.execute('DELETE FROM kit_simulation_item WHERE simulation_id = ?', (sim_id,))
+    else:
+        cursor = db.execute(
+            'INSERT INTO kit_simulation (name, margin_percent, final_price_cents) VALUES (?, ?, ?)',
+            (name, margin_percent, final_price_cents)
+        )
+        sim_id = cursor.lastrowid
+
+    for idx, raw_name in enumerate(item_names):
+        raw_name = raw_name.strip()
+        if not raw_name:
+            continue
+        try:
+            qty = float(item_qtys[idx].replace(',', '.')) if idx < len(item_qtys) and item_qtys[idx] else 1
+        except ValueError:
+            qty = 1
+        try:
+            unit_cost_cents = round(float(item_costs[idx].replace(',', '.')) * 100) if idx < len(item_costs) and item_costs[idx] else 0
+        except ValueError:
+            unit_cost_cents = 0
+        supplier = item_suppliers[idx].strip() if idx < len(item_suppliers) else ''
+        db.execute(
+            'INSERT INTO kit_simulation_item (simulation_id, name, quantity, unit_cost_cents, supplier, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
+            (sim_id, raw_name, qty, unit_cost_cents, supplier, idx)
+        )
+
+    db.commit()
+    flash(f'Simulação "{name}" guardada correctamente.', 'success')
+    return redirect(url_for('admin_simulator_edit', sim_id=sim_id))
+
+
+@app.route('/admin/simulador/<int:sim_id>/eliminar', methods=['POST'])
+@admin_required
+def admin_simulator_delete(sim_id):
+    db = get_db()
+    db.execute('DELETE FROM kit_simulation_item WHERE simulation_id = ?', (sim_id,))
+    db.execute('DELETE FROM kit_simulation WHERE id = ?', (sim_id,))
+    db.commit()
+    flash('Simulação eliminada.', 'success')
+    return redirect(url_for('admin_simulator_list'))
 
 
 def save_uploaded_image(file_storage):
