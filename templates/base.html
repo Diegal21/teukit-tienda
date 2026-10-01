@@ -31,9 +31,9 @@
             </button>
 
             <nav class="header-links" id="headerLinks">
-                <a href="{{ url_for('catalog') }}" class="account-link">{{ t('nav.catalog') }}</a>
+                <a href="{{ url_for('catalog') }}" class="account-link">{{ t('nav.family') }}</a>
                 <a href="{{ url_for('business_catalog') }}" class="account-link">{{ t('nav.business') }}</a>
-                <a href="{{ url_for('guide') }}" class="account-link">{{ t('nav.guide') }}</a>
+                <a href="{{ url_for('guide') }}" class="account-link">{{ t('nav.guides') }}</a>
                 <a href="{{ url_for('contact') }}" class="account-link">{{ t('nav.contact') }}</a>
                 {% if current_user %}
                     <a href="{{ url_for('my_account') }}" class="account-link">👤 {{ current_user.name.split(' ')[0] }}</a>

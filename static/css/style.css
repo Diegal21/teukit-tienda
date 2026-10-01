@@ -62,7 +62,8 @@ a { text-decoration: none; color: inherit; }
     display: none;
     flex-direction: column;
     justify-content: center;
-    gap: 5px;
+    align-items: center;
+    gap: 6px;
     background: none;
     border: none;
     cursor: pointer;
@@ -70,15 +71,17 @@ a { text-decoration: none; color: inherit; }
 }
 .menu-toggle span {
     display: block;
-    width: 24px;
     height: 3px;
     background: var(--branco);
     border-radius: 2px;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease, width 0.2s ease;
 }
-.menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.menu-toggle span:nth-child(1) { width: 26px; }
+.menu-toggle span:nth-child(2) { width: 14px; }
+.menu-toggle span:nth-child(3) { width: 20px; }
+.menu-toggle.open span:nth-child(1) { width: 24px; transform: translateY(9px) rotate(45deg); }
 .menu-toggle.open span:nth-child(2) { opacity: 0; }
-.menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+.menu-toggle.open span:nth-child(3) { width: 24px; transform: translateY(-9px) rotate(-45deg); }
 
 .header-links {
     display: flex;
@@ -1144,3 +1147,65 @@ body.theme-dark {
     max-width: 420px;
 }
 .sim-final-price .field-row { flex: 1; margin-bottom: 0; }
+
+/* BIBLIOTECA DE GUIAS DESCARGÁVEIS */
+.guide-library {
+    margin: 10px 0 36px;
+}
+.guide-library .section-title {
+    text-align: center;
+    color: var(--azul-marino);
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+}
+.guide-library-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.guide-library-col {
+    background: var(--branco);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 10px rgba(15,45,79,0.08);
+}
+.guide-library-col h3 {
+    color: var(--azul-marino);
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+.guide-library-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    color: var(--texto);
+    font-weight: 600;
+    font-size: 0.92rem;
+    border-bottom: 1px solid #eee;
+}
+.guide-library-item:last-child { border-bottom: none; }
+.guide-library-item:hover { color: var(--vermelho); }
+.guide-library-icon { font-size: 1.1rem; }
+.guide-library-empty {
+    color: #8a97a5;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 700px) {
+    .guide-library-columns { grid-template-columns: 1fr; }
+}
+
+.admin-upload-form {
+    background: var(--branco);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 26px;
+    max-width: 500px;
+    box-shadow: 0 2px 10px rgba(15,45,79,0.08);
+}
+.admin-subtitle {
+    color: var(--azul-marino);
+    font-size: 1.1rem;
+    margin: 20px 0 12px;
+}

@@ -28,7 +28,7 @@ ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'cambia-esta-clave-en-produccion')
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB máximo por imagen
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB máximo por subida (imagens e PDFs)
 
 
 # ----------------------------
@@ -137,6 +137,19 @@ def init_db():
             unit_cost_cents INTEGER DEFAULT 0,
             supplier TEXT,
             sort_order INTEGER DEFAULT 0
+        )
+    ''')
+
+    # ----------------------------
+    # BIBLIOTECA DE GUIAS DESCARGÁVEIS (PDFs subidos a mano pelo admin)
+    # ----------------------------
+    db.execute('''
+        CREATE TABLE IF NOT EXISTS uploaded_guide (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            segment TEXT NOT NULL DEFAULT 'familia',
+            filename TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 
@@ -665,7 +678,21 @@ def product_detail(slug):
 
 @app.route('/guia')
 def guide():
-    return render_template('guide.html')
+    db = get_db()
+    rows = db.execute('SELECT * FROM uploaded_guide ORDER BY created_at DESC').fetchall()
+    guides_familia = [g for g in rows if g['segment'] == 'familia']
+    guides_empresas = [g for g in rows if g['segment'] == 'empresas']
+    return render_template('guide.html', guides_familia=guides_familia, guides_empresas=guides_empresas)
+
+
+@app.route('/guia-pdf/<int:guide_id>')
+def download_uploaded_guide(guide_id):
+    db = get_db()
+    guide_row = db.execute('SELECT * FROM uploaded_guide WHERE id = ?', (guide_id,)).fetchone()
+    if not guide_row:
+        return "Guia no encontrada", 404
+    return send_from_directory(UPLOAD_FOLDER, guide_row['filename'], as_attachment=True,
+                                download_name=secure_filename(guide_row['title']) + '.pdf')
 
 
 @app.route('/guia/pdf')
@@ -1107,6 +1134,63 @@ def admin_simulator_delete(sim_id):
     return redirect(url_for('admin_simulator_list'))
 
 
+GUIDE_SEGMENTS = ['familia', 'empresas']
+
+
+@app.route('/admin/guias')
+@admin_required
+def admin_guides():
+    db = get_db()
+    guides = db.execute('SELECT * FROM uploaded_guide ORDER BY segment, created_at DESC').fetchall()
+    return render_template('admin_guides.html', guides=guides)
+
+
+@app.route('/admin/guias/subir', methods=['POST'])
+@admin_required
+def admin_guide_upload():
+    title = request.form.get('title', '').strip()
+    segment = request.form.get('segment', '').strip()
+
+    if not title or segment not in GUIDE_SEGMENTS:
+        flash('Preenche o título e escolhe uma categoria válida.', 'error')
+        return redirect(url_for('admin_guides'))
+
+    try:
+        filename = save_uploaded_pdf(request.files.get('pdf'))
+    except ValueError as e:
+        flash(str(e), 'error')
+        return redirect(url_for('admin_guides'))
+
+    if not filename:
+        flash('Selecciona un archivo PDF.', 'error')
+        return redirect(url_for('admin_guides'))
+
+    db = get_db()
+    db.execute(
+        'INSERT INTO uploaded_guide (title, segment, filename) VALUES (?, ?, ?)',
+        (title, segment, filename)
+    )
+    db.commit()
+    flash(f'Guia "{title}" subida com sucesso.', 'success')
+    return redirect(url_for('admin_guides'))
+
+
+@app.route('/admin/guias/<int:guide_id>/eliminar', methods=['POST'])
+@admin_required
+def admin_guide_delete(guide_id):
+    db = get_db()
+    guide_row = db.execute('SELECT * FROM uploaded_guide WHERE id = ?', (guide_id,)).fetchone()
+    if guide_row:
+        try:
+            os.remove(os.path.join(UPLOAD_FOLDER, guide_row['filename']))
+        except OSError:
+            pass
+        db.execute('DELETE FROM uploaded_guide WHERE id = ?', (guide_id,))
+        db.commit()
+        flash('Guia eliminada.', 'success')
+    return redirect(url_for('admin_guides'))
+
+
 def save_uploaded_image(file_storage):
     """Guarda una imagen subida en el volumen persistente y devuelve el
     valor a guardar en la columna 'image' (con el prefijo 'uploads/').
@@ -1122,6 +1206,23 @@ def save_uploaded_image(file_storage):
     unique_name = f"{uuid.uuid4().hex}.{ext}"
     file_storage.save(os.path.join(UPLOAD_FOLDER, unique_name))
     return f"uploads/{unique_name}"
+
+
+def save_uploaded_pdf(file_storage):
+    """Guarda un PDF de guía subido en el volumen persistente y devuelve el
+    nombre de archivo a guardar en la base de datos. Devuelve None si no se
+    subió ningún archivo."""
+    if not file_storage or file_storage.filename == '':
+        return None
+
+    filename = secure_filename(file_storage.filename)
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+    if ext != 'pdf':
+        raise ValueError('Formato no permitido. Debe ser un archivo PDF.')
+
+    unique_name = f"{uuid.uuid4().hex}.pdf"
+    file_storage.save(os.path.join(UPLOAD_FOLDER, unique_name))
+    return unique_name
 
 
 @app.route('/admin/produtos/novo', methods=['GET', 'POST'])

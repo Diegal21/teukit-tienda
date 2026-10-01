@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Guias — TeuKit{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Guias descarregáveis</h1>
+    <div>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-small">Ver produtos</a>
+        <a href="{{ url_for('admin_simulator_list') }}" class="btn btn-small">Simulador de kits</a>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-small">Ver pedidos</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-small">Sair</a>
+    </div>
+</div>
+
+<p class="admin-hint">
+    Sube aquí los PDFs de guías de cada kit. Cada una se clasifica como "Família" o
+    "Empresas" y aparece automáticamente agrupada así en la página pública /guia.
+</p>
+
+<form action="{{ url_for('admin_guide_upload') }}" method="POST" enctype="multipart/form-data" class="admin-upload-form">
+    <div class="field-row">
+        <label for="title">Título da guia</label>
+        <input type="text" id="title" name="title" placeholder="ex: Guia Kit de Incêndio" required>
+    </div>
+    <div class="field-row">
+        <label for="segment">Categoria</label>
+        <select id="segment" name="segment" required>
+            <option value="familia">Família</option>
+            <option value="empresas">Empresas</option>
+        </select>
+    </div>
+    <div class="field-row">
+        <label for="pdf">Arquivo PDF</label>
+        <input type="file" id="pdf" name="pdf" accept="application/pdf" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Subir guia</button>
+</form>
+
+<h2 class="admin-subtitle">Guias subidas</h2>
+{% if guides|length == 0 %}
+    <p>Ainda não subiste nenhuma guia.</p>
+{% else %}
+    {% for g in guides %}
+    <div class="order-card">
+        <div class="order-card-header">
+            <div>
+                <strong>{{ g.title }}</strong>
+                <span class="order-date">{{ 'Família' if g.segment == 'familia' else 'Empresas' }}</span>
+            </div>
+        </div>
+        <div class="order-card-footer">
+            <a href="{{ url_for('download_uploaded_guide', guide_id=g.id) }}" class="btn btn-small" download>Descarregar</a>
+            <form action="{{ url_for('admin_guide_delete', guide_id=g.id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta guia?');" style="display:inline;">
+                <button type="submit" class="btn btn-small remove-link">Eliminar</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

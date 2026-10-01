@@ -16,6 +16,38 @@
            class="btn btn-primary" download>{{ t('guide.download_button') }}</a>
     </div>
 
+    <div class="guide-library">
+        <h2 class="section-title">{{ t('guide.library_title') }}</h2>
+        <div class="guide-library-columns">
+            <div class="guide-library-col">
+                <h3>{{ t('guide.library_family') }}</h3>
+                {% if guides_familia %}
+                    {% for g in guides_familia %}
+                    <a href="{{ url_for('download_uploaded_guide', guide_id=g.id) }}" class="guide-library-item" download>
+                        <span class="guide-library-icon">📄</span>
+                        <span>{{ g.title }}</span>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p class="guide-library-empty">{{ t('guide.library_empty') }}</p>
+                {% endif %}
+            </div>
+            <div class="guide-library-col">
+                <h3>{{ t('guide.library_business') }}</h3>
+                {% if guides_empresas %}
+                    {% for g in guides_empresas %}
+                    <a href="{{ url_for('download_uploaded_guide', guide_id=g.id) }}" class="guide-library-item" download>
+                        <span class="guide-library-icon">📄</span>
+                        <span>{{ g.title }}</span>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p class="guide-library-empty">{{ t('guide.library_empty') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <div class="guide-grid">
         <div class="guide-item">
             <h3>{{ t('guide.item1_title') }}</h3>

@@ -8,7 +8,9 @@ TRANSLATIONS = {
 
     # --- Navegación y footer ---
     'nav.guide': {'pt': 'Guia', 'es': 'Guía', 'en': 'Guide'},
+    'nav.guides': {'pt': 'Guias', 'es': 'Guías', 'en': 'Guides'},
     'nav.catalog': {'pt': 'Catálogo', 'es': 'Catálogo', 'en': 'Catalog'},
+    'nav.family': {'pt': 'Família', 'es': 'Familia', 'en': 'Family'},
     'nav.business': {'pt': 'Empresas', 'es': 'Empresas', 'en': 'Business'},
     'nav.contact': {'pt': 'Contacto', 'es': 'Contacto', 'en': 'Contact'},
 
@@ -126,6 +128,10 @@ TRANSLATIONS = {
     'guide.download_title': {'pt': 'Guia completo em PDF', 'es': 'Guía completa en PDF', 'en': 'Full guide in PDF'},
     'guide.download_desc': {'pt': 'Conteúdo do kit, instruções de utilização e contactos úteis de emergência.', 'es': 'Contenido del kit, instrucciones de uso y contactos útiles de emergencia.', 'en': 'Kit contents, usage instructions and useful emergency contacts.'},
     'guide.download_button': {'pt': 'Descarregar PDF', 'es': 'Descargar PDF', 'en': 'Download PDF'},
+    'guide.library_title': {'pt': 'Mais guias disponíveis', 'es': 'Más guías disponibles', 'en': 'More guides available'},
+    'guide.library_family': {'pt': 'Família', 'es': 'Familia', 'en': 'Family'},
+    'guide.library_business': {'pt': 'Empresas', 'es': 'Empresas', 'en': 'Business'},
+    'guide.library_empty': {'pt': 'Em breve, novas guias nesta categoria.', 'es': 'Pronto, nuevas guías en esta categoría.', 'en': 'New guides coming soon in this category.'},
     'guide.item1_title': {'pt': '🎒 Mochila impermeável', 'es': '🎒 Mochila impermeable', 'en': '🎒 Waterproof backpack'},
     'guide.item1_desc': {'pt': 'Fácil de transportar e localizar rapidamente. Mantém-na sempre num local acessível da tua casa ou viatura.', 'es': 'Fácil de transportar y localizar rápidamente. Mantenla siempre en un lugar accesible de tu casa o vehículo.', 'en': 'Easy to carry and quickly locate. Always keep it in an accessible spot in your home or vehicle.'},
     'guide.item2_title': {'pt': '🩹 Kit de primeiros socorros', 'es': '🩹 Kit de primeros auxilios', 'en': '🩹 First aid kit'},
