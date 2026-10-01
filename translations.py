@@ -51,7 +51,7 @@ TRANSLATIONS = {
     'business.page_title': {'pt': 'Soluções para Empresas', 'es': 'Soluciones para Empresas', 'en': 'Business Solutions'},
     'business.page_subtitle': {'pt': 'Kits e ferramentas pensadas para o teu negócio.', 'es': 'Kits y herramientas pensadas para tu negocio.', 'en': 'Kits and tools designed for your business.'},
 
-    'category.nfc_resenas.name': {'pt': 'Cartões NFC de Avaliações', 'es': 'Tarjetas NFC de Reseñas', 'en': 'NFC Review Cards'},
+    'category.nfc_resenas.name': {'pt': 'Cartões QR/NFC de Avaliações', 'es': 'Tarjetas QR/NFC de Reseñas', 'en': 'QR/NFC Review Cards'},
     'category.nfc_resenas.desc': {'pt': 'Consegue mais avaliações no Google com um simples toque.', 'es': 'Consigue más reseñas en Google con un simple toque.', 'en': 'Get more Google reviews with a simple tap.'},
     'category.menu_digital.name': {'pt': 'Menu Digital QR/NFC', 'es': 'Menú Digital QR/NFC', 'en': 'Digital Menu QR/NFC'},
     'category.menu_digital.desc': {'pt': 'O teu menu sempre atualizado, sem custos de impressão.', 'es': 'Tu menú siempre actualizado, sin costos de impresión.', 'en': 'Your menu always up to date, no printing costs.'},
