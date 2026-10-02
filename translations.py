@@ -61,6 +61,10 @@ TRANSLATIONS = {
     'category.kit_incendio_hospedagem.desc': {'pt': 'Segurança essencial para hóspedes do teu Airbnb ou alojamento.', 'es': 'Seguridad esencial para huéspedes de tu Airbnb o alojamiento.', 'en': 'Essential safety for guests at your Airbnb or rental.'},
     'category.kit_boas_vindas_hospedagem.name': {'pt': 'Kit de Boas-Vindas para Alojamentos', 'es': 'Kit de Bienvenida para Alojamientos', 'en': 'Welcome Kit for Accommodations'},
     'category.kit_boas_vindas_hospedagem.desc': {'pt': 'Um mimo especial para os teus hóspedes desde o primeiro minuto.', 'es': 'Un detalle especial para tus huéspedes desde el primer minuto.', 'en': 'A special touch for your guests from the very first minute.'},
+    'category.kit_tvde.name': {'pt': 'Kits para TVDE', 'es': 'Kits para TVDE', 'en': 'Kits for Rideshare Drivers'},
+    'category.kit_tvde.desc': {'pt': 'Segurança e boa impressão para motoristas e passageiros.', 'es': 'Seguridad y buena impresión para conductores y pasajeros.', 'en': 'Safety and a great impression for drivers and passengers.'},
+    'category.kit_onboarding.name': {'pt': 'Kit Onboarding para New Joiners', 'es': 'Kit Onboarding para New Joiners', 'en': 'Onboarding Kit for New Joiners'},
+    'category.kit_onboarding.desc': {'pt': 'Uma primeira impressão memorável para quem começa na tua equipa.', 'es': 'Una primera impresión memorable para quienes se suman a tu equipo.', 'en': 'A memorable first impression for new members joining your team.'},
     'home.view_product': {'pt': 'Ver produto', 'es': 'Ver producto', 'en': 'View product'},
     'home.sold_out': {'pt': 'Esgotado', 'es': 'Agotado', 'en': 'Sold out'},
 

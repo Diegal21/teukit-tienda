@@ -258,7 +258,7 @@ app.jinja_env.globals.update(price_display=price_display, image_url=image_url, h
 # ----------------------------
 
 CATEGORY_ORDER = ['kit_emergencia', 'kit_incendios', 'kit_viajes', 'kit_automovil']
-BUSINESS_CATEGORY_ORDER = ['nfc_resenas', 'menu_digital', 'kit_incendio_hospedagem', 'kit_boas_vindas_hospedagem']
+BUSINESS_CATEGORY_ORDER = ['nfc_resenas', 'menu_digital', 'kit_incendio_hospedagem', 'kit_boas_vindas_hospedagem', 'kit_tvde', 'kit_onboarding']
 ALL_CATEGORIES = CATEGORY_ORDER + BUSINESS_CATEGORY_ORDER
 
 CATEGORY_IMAGES = {
@@ -270,6 +270,8 @@ CATEGORY_IMAGES = {
     'menu_digital': 'categoria-menu-digital.jpg',
     'kit_incendio_hospedagem': 'categoria-incendio-hospedagem.jpg',
     'kit_boas_vindas_hospedagem': 'categoria-boas-vindas-hospedagem.jpg',
+    'kit_tvde': 'categoria-tvde.jpg',
+    'kit_onboarding': 'categoria-onboarding.jpg',
 }
 
 
