@@ -6,6 +6,12 @@
     <h1>{{ t('guide.title') }}</h1>
     <p class="guide-intro">{{ t('guide.intro') }}</p>
 
+    {#
+        Tarjeta de descarga del PDF automático "dormida" a pedido — ahora el
+        recuadro destacado (borde amarillo) está en la sección de biblioteca
+        de guías de abajo, ya que ahí es donde se van a ir sumando los PDFs
+        de cada kit. Para reactivarla, descomenta este bloque.
+
     <div class="guide-download-card">
         <div class="guide-download-icon">📄</div>
         <div>
@@ -15,8 +21,9 @@
         <a href="{{ url_for('guide_pdf') }}"
            class="btn btn-primary" download>{{ t('guide.download_button') }}</a>
     </div>
+    #}
 
-    <div class="guide-library">
+    <div class="guide-library guide-library-highlight">
         <h2 class="section-title">{{ t('guide.library_title') }}</h2>
         <div class="guide-library-columns">
             <div class="guide-library-col">
