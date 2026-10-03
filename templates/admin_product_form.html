@@ -28,7 +28,7 @@
         <div class="field-row-checkbox">
             <label>
                 <input type="checkbox" name="is_addon">
-                É um complemento (não se vende sozinho, só aparece como sugestão para somar a um kit)
+                É um complemento (não se vende sozinho; aparece como sugestão só nos kits da mesma categoria escolhida abaixo)
             </label>
         </div>
 
@@ -63,9 +63,15 @@
         </div>
 
         <div class="field-row">
-            <label for="image">Imagem do produto</label>
+            <label for="image">Imagem principal do produto</label>
             <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/webp" required>
-            <small class="field-hint">Formatos aceites: PNG, JPG, WEBP. Máximo 5MB.</small>
+            <small class="field-hint">Esta é a foto que aparece nos catálogos e cartões. Formatos aceites: PNG, JPG, WEBP.</small>
+        </div>
+
+        <div class="field-row">
+            <label for="gallery_images">Fotos adicionais (galeria)</label>
+            <input type="file" id="gallery_images" name="gallery_images" accept="image/png, image/jpeg, image/webp" multiple>
+            <small class="field-hint">Opcional. Seleciona várias de uma vez (ex: 2 ou 3 fotos extra) para mostrar na página do produto.</small>
         </div>
 
         <button type="submit" class="btn btn-primary">Criar produto</button>

@@ -91,6 +91,19 @@ def init_db():
         db.execute("ALTER TABLE product ADD COLUMN is_addon INTEGER DEFAULT 0")
     except sqlite3.OperationalError:
         pass  # la columna ya existe
+
+    # Fotos adicionales por producto (galería). La columna 'image' de product
+    # sigue siendo la foto principal (la que se ve en listados y tarjetas);
+    # estas son las extra que solo se muestran en la página del producto.
+    db.execute('''
+        CREATE TABLE IF NOT EXISTS product_image (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            sort_order INTEGER DEFAULT 0
+        )
+    ''')
+
     db.execute('''
         CREATE TABLE IF NOT EXISTS "order" (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -251,7 +264,17 @@ def image_url(product):
     return url_for('static', filename='img/' + image)
 
 
-app.jinja_env.globals.update(price_display=price_display, image_url=image_url, has_discount=has_discount, effective_price_cents=effective_price_cents)
+def get_product_images(product_id):
+    """Fotos adicionales de la galería de un producto (sin incluir la
+    foto principal, que vive en product['image'])."""
+    db = get_db()
+    rows = db.execute(
+        'SELECT * FROM product_image WHERE product_id = ? ORDER BY sort_order, id', (product_id,)
+    ).fetchall()
+    return [{'id': row['id'], 'url': url_for('serve_upload', filename=row['filename'])} for row in rows]
+
+
+app.jinja_env.globals.update(price_display=price_display, image_url=image_url, has_discount=has_discount, effective_price_cents=effective_price_cents, get_product_images=get_product_images)
 
 # ----------------------------
 # CATEGORÍAS DEL CATÁLOGO
@@ -631,10 +654,17 @@ def get_bestseller_products(limit=8):
     ''', (*CATEGORY_ORDER, limit)).fetchall()
 
 
-def get_addon_products():
+def get_addon_products(category=None):
     """Productos "complemento": no se venden solos, solo se ofrecen como
-    sugerencia para sumar a un kit familiar ya existente."""
+    sugerencia para sumar a un kit familiar ya existente. Si se indica
+    'category', solo devuelve los complementos de esa misma categoría
+    (para no sugerir, por ejemplo, un detector de humo en un Kit de Viagem)."""
     db = get_db()
+    if category:
+        return db.execute(
+            'SELECT * FROM product WHERE is_addon = 1 AND active = 1 AND category = ? ORDER BY price_cents ASC',
+            (category,)
+        ).fetchall()
     return db.execute(
         'SELECT * FROM product WHERE is_addon = 1 AND active = 1 ORDER BY price_cents ASC'
     ).fetchall()
@@ -674,8 +704,9 @@ def product_detail(slug):
     is_business = is_business_category(product['category'])
     addons = []
     if not is_business and not product['is_addon']:
-        addons = get_addon_products()
-    return render_template('product_detail.html', product=product, is_business=is_business, addons=addons)
+        addons = get_addon_products(category=product['category'])
+    gallery = get_product_images(product['id'])
+    return render_template('product_detail.html', product=product, is_business=is_business, addons=addons, gallery=gallery)
 
 
 @app.route('/guia')
@@ -810,10 +841,21 @@ def cart_update(product_id):
 def cart_view():
     items, total_cents = get_cart_items()
     cart_product_ids = {item['product']['id'] for item in items}
-    addons = [a for a in get_addon_products() if a['id'] not in cart_product_ids]
+
+    # Complementos sugeridos, agrupados por categoría: cada kit en el carrito
+    # solo debe sugerir complementos de su propia categoría (ej: un Kit de
+    # Emergência no debería sugerir un detector de humo pensado para Incêndios).
+    addons_by_category = {}
+    for item in items:
+        cat = item['product']['category']
+        if cat not in addons_by_category:
+            addons_by_category[cat] = [
+                a for a in get_addon_products(category=cat) if a['id'] not in cart_product_ids
+            ]
+
     return render_template(
         'cart.html', items=items, total_display=price_display(total_cents),
-        is_empty=(len(items) == 0), addons=addons
+        is_empty=(len(items) == 0), addons_by_category=addons_by_category
     )
 
 
@@ -1275,10 +1317,25 @@ def admin_new_product():
             flash('Selecciona una imagen para el producto.', 'error')
             return render_template('admin_product_form.html', mode='new')
 
-        db.execute('''
+        cursor = db.execute('''
             INSERT INTO product (name, slug, price_cents, description, image, stock, active, category, discount_percent, is_addon)
             VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
         ''', (name, slug, price_cents, description, image_value, int(stock), category, discount_percent, is_addon))
+        new_product_id = cursor.lastrowid
+
+        # Fotos adicionales de la galería (opcional, se pueden elegir varias a la vez)
+        for idx, extra_file in enumerate(request.files.getlist('gallery_images')):
+            try:
+                extra_value = save_uploaded_image(extra_file)
+            except ValueError:
+                continue  # si una foto tiene formato inválido, se ignora y se sigue con las demás
+            if extra_value:
+                filename_only = extra_value[len('uploads/'):]
+                db.execute(
+                    'INSERT INTO product_image (product_id, filename, sort_order) VALUES (?, ?, ?)',
+                    (new_product_id, filename_only, idx)
+                )
+
         db.commit()
         flash(f'Produto "{name}" criado com sucesso.', 'success')
         return redirect(url_for('admin_products'))
@@ -1333,8 +1390,40 @@ def admin_update_product(product_id):
             'UPDATE product SET name = ?, stock = ?, description = ?, price_cents = ?, active = ?, category = ?, discount_percent = ?, is_addon = ? WHERE id = ?',
             (name, int(stock), description, price_cents, active, category, discount_percent, is_addon, product_id)
         )
+    # Fotos adicionales nuevas para la galería (se suman a las que ya tenía)
+    existing_count = db.execute(
+        'SELECT COUNT(*) FROM product_image WHERE product_id = ?', (product_id,)
+    ).fetchone()[0]
+    for idx, extra_file in enumerate(request.files.getlist('gallery_images')):
+        try:
+            extra_value = save_uploaded_image(extra_file)
+        except ValueError:
+            continue
+        if extra_value:
+            filename_only = extra_value[len('uploads/'):]
+            db.execute(
+                'INSERT INTO product_image (product_id, filename, sort_order) VALUES (?, ?, ?)',
+                (product_id, filename_only, existing_count + idx)
+            )
+
     db.commit()
     flash('Producto actualizado correctamente.', 'success')
+    return redirect(url_for('admin_products'))
+
+
+@app.route('/admin/produtos/imagem/<int:image_id>/eliminar', methods=['POST'])
+@admin_required
+def admin_delete_product_image(image_id):
+    db = get_db()
+    img_row = db.execute('SELECT * FROM product_image WHERE id = ?', (image_id,)).fetchone()
+    if img_row:
+        try:
+            os.remove(os.path.join(UPLOAD_FOLDER, img_row['filename']))
+        except OSError:
+            pass
+        db.execute('DELETE FROM product_image WHERE id = ?', (image_id,))
+        db.commit()
+        flash('Foto eliminada.', 'success')
     return redirect(url_for('admin_products'))
 
 

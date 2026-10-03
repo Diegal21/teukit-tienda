@@ -26,6 +26,20 @@
         <img src="{{ image_url(product) }}" alt="{{ product.name }}" class="product-thumb">
     </div>
 
+    {% set gallery = get_product_images(product.id) %}
+    {% if gallery %}
+    <div class="product-gallery-admin">
+        {% for photo in gallery %}
+        <div class="product-gallery-admin-item">
+            <img src="{{ photo.url }}" alt="Foto adicional">
+            <form action="{{ url_for('admin_delete_product_image', image_id=photo.id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta foto?');">
+                <button type="submit" class="btn btn-small remove-link">✕</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <form action="{{ url_for('admin_update_product', product_id=product.id) }}" method="POST" enctype="multipart/form-data" class="product-edit-form">
         <div class="field-row">
             <label for="name-{{ product.id }}">Nome do produto</label>
@@ -50,7 +64,7 @@
         <div class="field-row-checkbox">
             <label>
                 <input type="checkbox" name="is_addon" {% if product.is_addon %}checked{% endif %}>
-                É um complemento (não se vende sozinho, só aparece como sugestão para somar a um kit)
+                É um complemento (não se vende sozinho; aparece como sugestão só nos kits da mesma categoria escolhida abaixo)
             </label>
         </div>
 
@@ -80,8 +94,13 @@
         </div>
 
         <div class="field-row">
-            <label for="image-{{ product.id }}">Substituir imagem (opcional)</label>
+            <label for="image-{{ product.id }}">Substituir imagem principal (opcional)</label>
             <input type="file" id="image-{{ product.id }}" name="image" accept="image/png, image/jpeg, image/webp">
+        </div>
+
+        <div class="field-row">
+            <label for="gallery_images-{{ product.id }}">Adicionar mais fotos à galeria (opcional)</label>
+            <input type="file" id="gallery_images-{{ product.id }}" name="gallery_images" accept="image/png, image/jpeg, image/webp" multiple>
         </div>
 
         <div class="field-row-checkbox">

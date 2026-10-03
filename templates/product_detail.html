@@ -5,7 +5,15 @@
 {% block content %}
 <section class="product-detail">
     <div class="product-detail-img">
-        <img src="{{ image_url(product) }}" alt="{{ product.name }}">
+        <img src="{{ image_url(product) }}" alt="{{ product.name }}" id="mainProductImage">
+        {% if gallery %}
+        <div class="product-gallery-thumbs">
+            <img src="{{ image_url(product) }}" alt="{{ product.name }}" class="product-gallery-thumb active">
+            {% for photo in gallery %}
+            <img src="{{ photo.url }}" alt="{{ product.name }}" class="product-gallery-thumb">
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
     <div class="product-detail-info">
         <h1>{{ product.name }}</h1>
@@ -43,4 +51,20 @@
         </form>
     </div>
 </section>
+
+{% if gallery %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var mainImg = document.getElementById('mainProductImage');
+        var thumbs = document.querySelectorAll('.product-gallery-thumb');
+        thumbs.forEach(function (thumb) {
+            thumb.addEventListener('click', function () {
+                mainImg.src = thumb.src;
+                thumbs.forEach(function (t) { t.classList.remove('active'); });
+                thumb.classList.add('active');
+            });
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}
