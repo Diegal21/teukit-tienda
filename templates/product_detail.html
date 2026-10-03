@@ -18,7 +18,10 @@
     <div class="product-detail-info">
         <h1>{{ product.name }}</h1>
         {% with large = true %}{% include "_price_block.html" %}{% endwith %}
-        <p class="description">{{ product.description }}</p>
+        <div class="description-wrapper">
+            <p class="description" id="productDescription">{{ product.description }}</p>
+        </div>
+        <button type="button" class="description-toggle-btn" id="descriptionToggleBtn" style="display:none;">{{ t('product.read_more') }}</button>
 
         <form action="{{ url_for('cart_add', product_id=product.id) }}" method="POST" class="add-to-cart-form">
             <div class="qty-row">
@@ -67,4 +70,22 @@
     });
 </script>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var desc = document.getElementById('productDescription');
+        var btn = document.getElementById('descriptionToggleBtn');
+        if (!desc || !btn) return;
+
+        // Solo mostramos el botón "Ver mais" si el texto realmente se corta
+        // con el límite de altura colapsada (si es corto, no aparece nada).
+        if (desc.scrollHeight > desc.clientHeight + 4) {
+            btn.style.display = 'inline-block';
+            btn.addEventListener('click', function () {
+                var expanded = desc.classList.toggle('expanded');
+                btn.textContent = expanded ? '{{ t("product.read_less") }}' : '{{ t("product.read_more") }}';
+            });
+        }
+    });
+</script>
 {% endblock %}

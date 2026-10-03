@@ -71,6 +71,8 @@ TRANSLATIONS = {
     # --- Producto ---
     'product.quantity': {'pt': 'Quantidade', 'es': 'Cantidad', 'en': 'Quantity'},
     'product.add_to_cart': {'pt': 'Adicionar ao carrinho', 'es': 'Añadir al carrito', 'en': 'Add to cart'},
+    'product.read_more': {'pt': 'Ver mais', 'es': 'Ver más', 'en': 'Read more'},
+    'product.read_less': {'pt': 'Ver menos', 'es': 'Ver menos', 'en': 'Read less'},
     'product.addons_title': {'pt': 'Queres completar o teu kit?', 'es': '¿Querés completar tu kit?', 'en': 'Want to complete your kit?'},
     'product.addons_hint': {'pt': 'Adiciona estes complementos junto com o teu kit.', 'es': 'Agregá estos complementos junto con tu kit.', 'en': 'Add these extras along with your kit.'},
     'product.sold_out': {'pt': 'Esgotado', 'es': 'Agotado', 'en': 'Sold out'},

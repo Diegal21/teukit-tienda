@@ -612,11 +612,35 @@ a { text-decoration: none; color: inherit; }
     color: var(--azul-marino);
     margin-bottom: 12px;
 }
+.description-wrapper {
+    position: relative;
+    margin: 16px 0 6px;
+}
 .description {
-    margin: 16px 0 24px;
     color: #445566;
     white-space: pre-line;
+    max-height: 110px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
 }
+.description.expanded {
+    max-height: 2000px;
+}
+.description-wrapper:has(.description:not(.expanded)) .description {
+    -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+}
+.description-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--vermelho);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0 0 18px;
+}
+.description-toggle-btn:hover { text-decoration: underline; }
 .add-to-cart-form {
     display: flex;
     flex-direction: column;
